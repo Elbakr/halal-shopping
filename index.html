@@ -647,7 +647,7 @@ function loadPlaces(lat,lon){
     for(var a=Math.floor(lat-R);a<=Math.floor(lat+R);a++)for(var o=Math.floor(lon-dl);o<=Math.floor(lon+dl);o++){var k=a+"_"+o;if(ix.tiles[k])keys.push(k)}
     return Promise.all([addedNear(lat,lon)].concat(keys.map(function(k){return fetch("data/places/"+k+".json").then(function(r){return r.ok?r.json():[]}).catch(function(){return []})})));
   }).then(function(ts){
-    var all=ts.shift(); ts.forEach(function(v){v.forEach(function(p){all.push({id:p.i,name:p.n,lat:p.la,lon:p.lo,type:PTYPE[p.t]||"t_shop",addr:p.a||"",city:p.c||"",cuisine:p.k||"",maybe:!!p.p,d:dist(lat,lon,p.la,p.lo)})})});
+    var all=ts.shift(); ts.forEach(function(v){v.forEach(function(p){all.push({id:p.i,name:p.n,lat:p.la,lon:p.lo,type:PTYPE[p.t]||"t_shop",addr:p.a||"",city:p.c||"",cuisine:p.k||"",maybe:!!p.p,unsure:p.p===2,d:dist(lat,lon,p.la,p.lo)})})});
     var near=all.filter(function(p){return p.d<=3}); if(near.length<20)near=all.filter(function(p){return p.d<=8}); if(near.length<12)near=all.filter(function(p){return p.d<=30});
     showPlaces(near,lat,lon);
   }).catch(function(){livePlaces(lat,lon,4000)});
@@ -664,7 +664,7 @@ function renderPlaces(){
   $("plist").innerHTML=visiblePlaces().map(function(p){
     var cf=(PCOUNTS[p.id]||{}).confirm||0;
     function b(kind,key,cls){var on=d["pl:"+p.id+":"+kind],n=(PCOUNTS[p.id]||{})[kind]||0;return '<button type="button" class="pb '+cls+(on?" on":"")+'" data-pl="'+p.id+'" data-pk="'+kind+'"'+(HSAPI_OK?"":" disabled")+' aria-pressed="'+(on?"true":"false")+'">'+esc(t(key))+(n?' <i>'+n+'</i>':"")+'</button>'}
-    return '<div class="pl"><div class="ptr"><span class="pt">'+esc(t(p.type))+'</span>'+(cf?'<span class="pt ok">'+esc(cnt("p_conf",cf))+'</span>':p.maybe?'<span class="pt mb">'+esc(t(p.added?"addedBy":"p_maybe"))+'</span>':"")+'</div><b>'+esc(p.name)+'</b><span class="pm">'+esc(placeMeta(p))+'</span><div class="pa">'+b("confirm","pc_confirm","c")+b("nothalal","pc_not","n")+b("closed","pc_closed","")+'<a class="pb" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lon+'">'+esc(t("route"))+'</a></div></div>'}).join("");
+    return '<div class="pl"><div class="ptr"><span class="pt">'+esc(t(p.type))+'</span>'+(cf?'<span class="pt ok">'+esc(cnt("p_conf",cf))+'</span>':p.maybe?'<span class="pt mb">'+esc(t(p.added?"addedBy":p.unsure?"f_todo":"p_maybe"))+'</span>':"")+'</div><b>'+esc(p.name)+'</b><span class="pm">'+esc(placeMeta(p))+'</span><div class="pa">'+b("confirm","pc_confirm","c")+b("nothalal","pc_not","n")+b("closed","pc_closed","")+'<a class="pb" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lon+'">'+esc(t("route"))+'</a></div></div>'}).join("");
 }
 function drawMap(){
   if(!PLACES.length){$("pmap").hidden=true;return}
