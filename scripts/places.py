@@ -105,6 +105,19 @@ def main():
     print(len(places), "named places,", sum(1 for p in places if "p" not in p), "declared", flush=True)
     if len(places) < 1000:
         print("Too few results: keeping the previous files untouched."); sys.exit(0 if os.path.isdir(OUT) else 1)
+    # An unverified butcher surrounded by halal venues is worth asking members about first ("q").
+    grid = {}
+    for x in places:
+        if x.get("p") != 2: grid.setdefault((round(x["la"] / 0.003), round(x["lo"] / 0.003)), []).append(x)
+    for x in places:
+        if x.get("p") != 2: continue
+        a, o, n = round(x["la"] / 0.003), round(x["lo"] / 0.003), 0
+        for da in (-1, 0, 1):
+            for do in (-1, 0, 1):
+                for y in grid.get((a + da, o + do), ()):
+                    if abs(y["la"] - x["la"]) < 0.0027 and abs(y["lo"] - x["lo"]) * math.cos(math.radians(x["la"])) < 0.0027: n += 1
+        if n >= 5: x["q"] = 1
+    print(sum(1 for x in places if x.get("q")), "butchers in halal-dense streets", flush=True)
     tiles = {}
     for p in places:
         tiles.setdefault(f"{math.floor(p['la'])}_{math.floor(p['lo'])}", []).append(p)

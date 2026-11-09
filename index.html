@@ -595,8 +595,9 @@ function renderFilters(){
   $("addName").placeholder=t("addName");
 }
 function hiddenPlace(p){var c=PCOUNTS[p.id]||{};return ((c.nothalal||0)>=(p.added?2:3)&&(c.nothalal||0)>(c.confirm||0))||((c.closed||0)>=(p.added?2:3))}
-function visiblePlaces(){return PLACES.filter(function(p){ if(hiddenPlace(p))return false; if(pfilter==="all")return true; if(pfilter==="todo")return p.maybe&&!((PCOUNTS[p.id]||{}).confirm); return p.type===pfilter })}
-function todoPlaces(){var d=getDone();return PLACES.filter(function(p){return p.maybe&&!hiddenPlace(p)&&!((PCOUNTS[p.id]||{}).confirm)&&!d["pl:"+p.id+":confirm"]&&!d["pl:"+p.id+":nothalal"]&&!d["pl:"+p.id+":closed"]&&!SKIP[p.id]})}
+// "low": a butcher nobody declared halal, away from halal streets. Listed under the Butcher filter only, until a member confirms it.
+function visiblePlaces(){return PLACES.filter(function(p){ if(hiddenPlace(p))return false; var cf=(PCOUNTS[p.id]||{}).confirm; if(pfilter==="all")return !p.low||cf; if(pfilter==="todo")return p.maybe&&!p.low&&!cf; return p.type===pfilter }).slice(0,60)}
+function todoPlaces(){var d=getDone();return PLACES.filter(function(p){return p.maybe&&!p.low&&!hiddenPlace(p)&&!((PCOUNTS[p.id]||{}).confirm)&&!d["pl:"+p.id+":confirm"]&&!d["pl:"+p.id+":nothalal"]&&!d["pl:"+p.id+":closed"]&&!SKIP[p.id]})}
 function placeMeta(p){var km=p.d<1?Math.round(p.d*1000)+" m":p.d.toFixed(1)+" km";return [p.addr,p.city,p.cuisine,km].filter(Boolean).join(" · ")}
 function renderMission(){
   var el=$("mission"); if(!HSAPI_OK){el.hidden=true;return}
@@ -636,7 +637,7 @@ function addedNear(lat,lon){
     return (j.items||[]).map(function(x){return {id:"u"+x.id,name:x.name,lat:x.lat,lon:x.lon,type:PTYPE[x.kind]||"t_shop",addr:"",city:"",cuisine:"",maybe:true,added:true,d:dist(lat,lon,x.lat,x.lon)}})}).catch(function(){return []});
 }
 function showPlaces(list,lat,lon){
-  PLACES=list.sort(function(a,b){return a.d-b.d}).slice(0,60);
+  PLACES=list.sort(function(a,b){return a.d-b.d}).slice(0,600);
   pmsg(PLACES.length?"":t("p_none")); renderPlaces(); drawMap(); loadPlaceCounts();
 }
 // Nightly tiles (1 degree) generated from OpenStreetMap: instant, no third-party wait
@@ -647,8 +648,8 @@ function loadPlaces(lat,lon){
     for(var a=Math.floor(lat-R);a<=Math.floor(lat+R);a++)for(var o=Math.floor(lon-dl);o<=Math.floor(lon+dl);o++){var k=a+"_"+o;if(ix.tiles[k])keys.push(k)}
     return Promise.all([addedNear(lat,lon)].concat(keys.map(function(k){return fetch("data/places/"+k+".json").then(function(r){return r.ok?r.json():[]}).catch(function(){return []})})));
   }).then(function(ts){
-    var all=ts.shift(); ts.forEach(function(v){v.forEach(function(p){all.push({id:p.i,name:p.n,lat:p.la,lon:p.lo,type:PTYPE[p.t]||"t_shop",addr:p.a||"",city:p.c||"",cuisine:p.k||"",maybe:!!p.p,unsure:p.p===2,d:dist(lat,lon,p.la,p.lo)})})});
-    var near=all.filter(function(p){return p.d<=3}); if(near.length<20)near=all.filter(function(p){return p.d<=8}); if(near.length<12)near=all.filter(function(p){return p.d<=30});
+    var all=ts.shift(); ts.forEach(function(v){v.forEach(function(p){all.push({id:p.i,name:p.n,lat:p.la,lon:p.lo,type:PTYPE[p.t]||"t_shop",addr:p.a||"",city:p.c||"",cuisine:p.k||"",maybe:!!p.p,unsure:p.p===2,low:p.p===2&&!p.q,d:dist(lat,lon,p.la,p.lo)})})});
+    var hi=function(r){return all.filter(function(p){return p.d<=r&&!p.low}).length}, R2=hi(3)>=20?3:hi(8)>=12?8:30, near=all.filter(function(p){return p.d<=R2});
     showPlaces(near,lat,lon);
   }).catch(function(){livePlaces(lat,lon,4000)});
 }
@@ -667,21 +668,21 @@ function renderPlaces(){
     return '<div class="pl"><div class="ptr"><span class="pt">'+esc(t(p.type))+'</span>'+(cf?'<span class="pt ok">'+esc(cnt("p_conf",cf))+'</span>':p.maybe?'<span class="pt mb">'+esc(t(p.added?"addedBy":p.unsure?"f_todo":"p_maybe"))+'</span>':"")+'</div><b>'+esc(p.name)+'</b><span class="pm">'+esc(placeMeta(p))+'</span><div class="pa">'+b("confirm","pc_confirm","c")+b("nothalal","pc_not","n")+b("closed","pc_closed","")+'<a class="pb" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lon+'">'+esc(t("route"))+'</a></div></div>'}).join("");
 }
 function drawMap(){
-  if(!PLACES.length){$("pmap").hidden=true;return}
+  var VIS=visiblePlaces(); if(!VIS.length){$("pmap").hidden=true;return}
   loadLeaflet().then(function(){
     $("pmap").hidden=false;
     if(!pmap){pmap=window.L.map("pmap",{scrollWheelZoom:false});window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(pmap)}
     if(player)player.remove(); player=window.L.layerGroup().addTo(pmap);
-    PLACES.forEach(function(p){window.L.circleMarker([p.lat,p.lon],{radius:p.maybe?6:8,color:p.maybe?"#a86a00":"#0a7550",fillColor:p.maybe?"#f5c451":"#34d399",fillOpacity:.9,weight:2}).bindPopup("<b>"+esc(p.name)+"</b>").addTo(player)});
+    VIS.forEach(function(p){window.L.circleMarker([p.lat,p.lon],{radius:p.maybe?6:8,color:p.maybe?"#a86a00":"#0a7550",fillColor:p.maybe?"#f5c451":"#34d399",fillOpacity:.9,weight:2}).bindPopup("<b>"+esc(p.name)+"</b>").addTo(player)});
     window.L.circleMarker(pcenter,{radius:6,color:"#0f211b",fillColor:"#0f211b",fillOpacity:1}).addTo(player);
-    pmap.fitBounds(PLACES.slice(0,15).map(function(p){return [p.lat,p.lon]}).concat([pcenter]),{padding:[24,24],maxZoom:16}); setTimeout(function(){pmap.invalidateSize()},200);
+    pmap.fitBounds(VIS.slice(0,15).map(function(p){return [p.lat,p.lon]}).concat([pcenter]),{padding:[24,24],maxZoom:16}); setTimeout(function(){pmap.invalidateSize()},200);
   }).catch(function(){});
 }
 function loadPlaceCounts(){
   if(!HSAPI_OK||!PLACES.length)return;
-  var f=PLACES.slice(0,60).map(function(p){return "osm='"+p.id+"'"}).join("||");
+  var V=visiblePlaces(), f=V.map(function(p){return "osm='"+p.id+"'"}).join("||"); if(!V.length)return;
   fetch(HSAPI+"/api/collections/place_counts/records?perPage=200&filter="+encodeURIComponent("("+f+")")).then(function(r){return r.ok?r.json():null}).then(function(j){
-    if(!j)return; PCOUNTS={}; (j.items||[]).forEach(function(x){(PCOUNTS[x.osm]=PCOUNTS[x.osm]||{})[x.kind]=x.n}); renderPlaces();
+    if(!j)return; V.forEach(function(p){delete PCOUNTS[p.id]}); (j.items||[]).forEach(function(x){(PCOUNTS[x.osm]=PCOUNTS[x.osm]||{})[x.kind]=x.n}); renderPlaces();
   }).catch(function(){});
 }
 function sendPlace(id,kind,btn){
@@ -772,7 +773,7 @@ document.addEventListener("click",function(e){
   var z=e.target.closest("[data-zoom]"); if(z){var im=$("lbi");im.src=z.querySelector("img").src;$("lb").classList.remove("big");$("lb").hidden=false;var hi=new Image();hi.onload=function(){im.src=hi.src};hi.src=z.dataset.zoom;return}
   if(e.target.id==="lbi"){$("lb").classList.toggle("big");return}
   if(e.target.closest("#lbx")||e.target.classList.contains("lbs")){$("lb").hidden=true;return}
-  var pf=e.target.closest("[data-pf]"); if(pf){pfilter=pf.dataset.pf;renderFilters();renderPlaces();return}
+  var pf=e.target.closest("[data-pf]"); if(pf){pfilter=pf.dataset.pf;renderFilters();renderPlaces();drawMap();loadPlaceCounts();return}
   var ak=e.target.closest("[data-ak]"); if(ak){addKind=ak.dataset.ak;renderFilters();return}
   if(e.target.closest("#missionGo")){var q=todoPlaces().slice(0,10);if(q.length){MISSION={list:q,i:0};renderMission()}return}
   var mm=e.target.closest("[data-m]"); if(mm){missionAnswer(mm.dataset.m);return}
