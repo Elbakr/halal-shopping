@@ -101,7 +101,16 @@ main .in{display:flex;flex-direction:column;gap:40px;padding-block:28px 48px}
 .btxt strong{display:block;font-family:var(--f-display);font-weight:800;font-size:clamp(22px,5vw,30px);line-height:1.05;letter-spacing:-.02em}
 .btxt span{font-size:15px;opacity:.92}
 .prod{display:flex;gap:16px;padding:18px 22px;align-items:center}
-.prod img{width:92px;height:92px;object-fit:contain;border-radius:12px;background:var(--paper);flex:none}
+.zoom{position:relative;flex:none;border:0;padding:0;background:var(--paper);border-radius:14px;cursor:zoom-in;width:132px;height:132px;overflow:hidden}
+.zoom img{width:100%;height:100%;object-fit:contain;display:block}
+.zi{position:absolute;inset-inline-end:6px;bottom:6px;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center}.zi svg{width:16px;height:16px}
+#lb{position:fixed;inset:0;z-index:50;background:rgba(5,15,11,.94);display:flex;flex-direction:column}
+#lb .lbbar{display:flex;justify-content:flex-end;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px}
+#lb .lbx{font:inherit;font-size:28px;line-height:1;width:46px;height:46px;border-radius:50%;border:0;background:#fff;color:#0f211b;cursor:pointer}
+#lb .lbs{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;touch-action:pinch-zoom pan-x pan-y}
+#lb img{max-width:100%;max-height:100%;cursor:zoom-in;display:block}
+#lb.big .lbs{align-items:flex-start;justify-content:flex-start}
+#lb.big img{max-width:none;max-height:none;width:220%;cursor:zoom-out}
 .prod h2{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.1;margin:0;overflow-wrap:anywhere}
 .meta{font-family:var(--f-mono);font-size:13px;color:var(--muted);overflow-wrap:anywhere}
 .flags{border-top:1px solid var(--line)}
@@ -124,10 +133,10 @@ h2.sec{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,5vw,32p
 .shelves::-webkit-scrollbar{display:none}
 .shelf{font:inherit;font-weight:700;font-size:15px;white-space:nowrap;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:9px 16px;cursor:pointer}
 .shelf[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}
 .tile{font:inherit;text-align:start;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:transform .15s,box-shadow .15s}
 .tile:hover{transform:translateY(-2px);box-shadow:0 12px 24px -18px rgba(15,33,27,.5)}
-.tile .ph{aspect-ratio:1;border-radius:11px;background:var(--paper);display:grid;place-items:center;overflow:hidden}
+.tile .ph{aspect-ratio:4/5;border-radius:11px;background:var(--paper);display:grid;place-items:center;overflow:hidden}
 .tile img{width:100%;height:100%;object-fit:contain}
 .tile b{font-size:14px;line-height:1.25;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tile small{font-size:12px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -159,6 +168,20 @@ h2.sec{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,5vw,32p
 .cm{font-size:13px;font-weight:700;border-radius:8px;padding:4px 9px;background:var(--card)}
 .cm.seen{color:var(--go)}.cm.notseen{color:var(--stop)}.cm.changed{color:var(--wait)}
 .mine{align-self:flex-start;font-size:14px;font-weight:700;color:#05211a;background:var(--go-bright);border-radius:999px;padding:5px 12px}
+.goplaces{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;font-weight:700;font-size:17px;color:var(--hero-ink);border:1.5px solid var(--hero-ink);border-radius:16px;padding:14px 18px}
+.prow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.prow input{flex:1 1 180px;min-width:0;font:inherit;font-size:16px;padding:10px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+#pmap{height:300px;border-radius:16px;overflow:hidden;border:1px solid var(--line);margin-bottom:12px;z-index:0;position:relative}
+.plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.pl{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.pl b{font-family:var(--f-display);font-size:17px;line-height:1.2;overflow-wrap:anywhere}
+.pl .pm{font-size:13px;color:var(--muted)}
+.pl .pt{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--go);background:var(--go-soft);border-radius:6px;padding:2px 7px}
+.pl .pa{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.pb{font:inherit;font-size:13px;font-weight:700;border-radius:999px;padding:7px 12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
+.pb.c{border-color:var(--go);color:var(--go)}.pb.n{border-color:var(--stop);color:var(--stop)}
+.pb.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.pb i{font-style:normal;font-family:var(--f-mono)}
 /* Traps */
 .traps{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
 .trap{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:6px}
@@ -208,6 +231,7 @@ footer .in{padding-block:22px calc(28px + env(safe-area-inset-bottom,0px));displ
       <div class="mini"><label for="photo" data-t="photo"></label><input type="file" id="photo" accept="image/*" capture="environment" hidden><input type="file" id="logoPhoto" accept="image/*" capture="environment" hidden></div>
       <div id="msg" role="status" aria-live="polite"></div>
     </div>
+    <a class="goplaces" href="#places" id="goplaces"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg><span data-t="placesT"></span></a>
     <div class="mine" id="mine" hidden></div>
     <div class="trust"><span data-t="t1"></span><span data-t="t2"></span><span data-t="t3"></span></div>
   </div>
@@ -218,6 +242,19 @@ footer .in{padding-block:22px calc(28px + env(safe-area-inset-bottom,0px));displ
     <section id="alerts" hidden></section>
     <section id="out" aria-live="polite" hidden></section>
     <section id="watchBox" hidden><div class="sechead"><h2 class="sec" data-t="watchT"></h2></div><div class="chips" id="watch"></div></section>
+
+    <section id="places">
+      <div class="sechead"><h2 class="sec" data-t="placesT"></h2><p data-t="placesL"></p></div>
+      <form class="prow" id="pf">
+        <button type="button" class="btn solid" id="near"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg><span data-t="near"></span></button>
+        <input id="city" autocomplete="off" enterkeyhint="search">
+        <button type="submit" class="btn" data-t="find"></button>
+      </form>
+      <div id="pmsg" class="src" role="status" aria-live="polite"></div>
+      <div id="pmap" hidden></div>
+      <div class="plist" id="plist"></div>
+      <p class="src" data-t="p_src" style="margin:10px 0 0"></p>
+    </section>
 
     <section>
       <div class="sechead"><h2 class="sec" data-t="shelvesT"></h2><p data-t="shelvesL"></p></div>
@@ -253,6 +290,7 @@ footer .in{padding-block:22px calc(28px + env(safe-area-inset-bottom,0px));displ
   </div>
 </main>
 
+<div id="lb" hidden><div class="lbbar"><button type="button" class="lbx" id="lbx" aria-label="×">×</button></div><div class="lbs"><img id="lbi" alt=""></div></div>
 <footer><div class="in">
   <span data-t="legal"></span>
   <span data-t="data"></span>
@@ -324,7 +362,7 @@ function analyse(p){
 
 // ---------- Text ----------
 var T={
-fr:{helpT:"Aidez la communauté en un geste",q_logo:"Voyez-vous un logo halal sur l'emballage ?",yes:"Oui, je le vois",no:"Non, aucun logo",changedBtn:"La recette a changé",photoIng:"Photo des ingrédients",photoFront:"Photo du produit",thanks:"Merci ! Votre signalement compte.",c_seen:"Logo halal vu par {n} membres",c_notseen:"Aucun logo vu par {n} membres",c_changed:"Recette signalée changée par {n} membres",mine:"Vos contributions : {n}",unknownT:"Produit inconnu. Ajoutez-le en deux photos, sans quitter la page.",sendLogo:"Envoyer une photo du logo halal",sent:"Merci, photo reçue. Elle sera vérifiée avant d'enrichir la fiche.",sendFail:"L'envoi n'a pas abouti. Réessayez dans un instant.",cert:"Organisme cité",certT:"Qui certifie quoi",certL:"Les organismes cités sur les emballages, parmi les 3 000 produits halal les plus scannés.",follow:"Suivre ce produit",following:"Suivi",watchT:"Mes produits suivis",changed:"a changé depuis votre dernière visite",lost:"ne porte plus de mention halal",fix:"Compléter la fiche",changesT:"Changements détectés",chAdd:"additifs modifiés",chIng:"liste d'ingrédients modifiée",byname:"La recherche par nom est saturée en ce moment. Tapez les chiffres du code-barres ou scannez.",h1:"Halal ou pas ?<br><em>Scannez.</em> La réponse en 2 secondes.",sub:"Visez le code-barres d'un produit. Vous voyez s'il porte une mention halal, et chaque ingrédient qui pose question.",camera:"Scanner un produit",check:"Vérifier",photo:"ou envoyer une photo du code-barres",placeholder:"Code-barres ou nom du produit",
+fr:{placesT:"Commerces et restaurants halal",placesL:"Les adresses déclarées halal autour de vous. Confirmez ou corrigez d'un geste.",near:"Autour de moi",cityPh:"Ville ou adresse",find:"Chercher",p_none:"Aucune adresse déclarée halal trouvée ici pour le moment.",p_src:"Lieux déclarés halal sur OpenStreetMap. Aucune certification de notre part.",route:"Itinéraire",pc_confirm:"Je confirme",pc_not:"Plus halal",pc_closed:"Fermé",geoFail:"Position indisponible. Tapez une ville.",t_rest:"Restaurant",t_fast:"Restauration rapide",t_butcher:"Boucherie",t_shop:"Commerce",helpT:"Aidez la communauté en un geste",q_logo:"Voyez-vous un logo halal sur l'emballage ?",yes:"Oui, je le vois",no:"Non, aucun logo",changedBtn:"La recette a changé",photoIng:"Photo des ingrédients",photoFront:"Photo du produit",thanks:"Merci ! Votre signalement compte.",c_seen:"Logo halal vu par {n} membres",c_notseen:"Aucun logo vu par {n} membres",c_changed:"Recette signalée changée par {n} membres",mine:"Vos contributions : {n}",unknownT:"Produit inconnu. Ajoutez-le en deux photos, sans quitter la page.",sendLogo:"Envoyer une photo du logo halal",sent:"Merci, photo reçue. Elle sera vérifiée avant d'enrichir la fiche.",sendFail:"L'envoi n'a pas abouti. Réessayez dans un instant.",cert:"Organisme cité",certT:"Qui certifie quoi",certL:"Les organismes cités sur les emballages, parmi les 3 000 produits halal les plus scannés.",follow:"Suivre ce produit",following:"Suivi",watchT:"Mes produits suivis",changed:"a changé depuis votre dernière visite",lost:"ne porte plus de mention halal",fix:"Compléter la fiche",changesT:"Changements détectés",chAdd:"additifs modifiés",chIng:"liste d'ingrédients modifiée",byname:"La recherche par nom est saturée en ce moment. Tapez les chiffres du code-barres ou scannez.",h1:"Halal ou pas ?<br><em>Scannez.</em> La réponse en 2 secondes.",sub:"Visez le code-barres d'un produit. Vous voyez s'il porte une mention halal, et chaque ingrédient qui pose question.",camera:"Scanner un produit",check:"Vérifier",photo:"ou envoyer une photo du code-barres",placeholder:"Code-barres ou nom du produit",
  t1:"Gratuit, sans inscription",t2:"Base mondiale de produits",t3:"Plus de 15 langues",
  loading:"Recherche du produit…",notfound:"Ce produit n'est pas encore dans la base. Ajoutez-le en 1 minute, il servira à tout le monde.",offline:"La base produits ne répond pas. Réessayez dans un instant.",nocam:"Caméra indisponible sur cet appareil. Envoyez une photo du code-barres ou tapez les chiffres.",nobar:"Aucun code-barres lu. Reprenez la photo plus près.",camhint:"Visez le code-barres, la lecture est automatique.",
  s_ok:"Halal déclaré",s_bad:"Pas halal",s_conflict:"Halal déclaré, à contrôler",s_check:"À vérifier",s_none:"Aucune mention halal",s_empty:"Ingrédients inconnus",
@@ -335,7 +373,7 @@ fr:{helpT:"Aidez la communauté en un geste",q_logo:"Voyez-vous un logo halal su
  howT:"Comment ça marche",s1:"Scannez",s1p:"Le code-barres suffit. Aucune inscription.",s2:"Lisez le verdict",s2p:"Vert, orange ou rouge, avec la raison écrite en clair.",s3:"Choisissez mieux",s3p:"Des produits du même rayon qui déclarent une mention halal.",
  legal:"halal.shopping ne certifie aucun produit. Nous lisons les mentions déclarées par les marques et les listes d'ingrédients. En cas de doute, l'emballage et l'organisme certificateur font foi.",data:"Données produits : Open Food Facts, licence ODbL.",
  sh:{candies:"Bonbons",chocolates:"Chocolats",biscuits:"Biscuits",sausages:"Charcuterie",meats:"Viandes",cheeses:"Fromages",frozen:"Surgelés",snacks:"Apéritif",beverages:"Boissons"}},
-nl:{helpT:"Help de gemeenschap met één tik",q_logo:"Zie je een halallogo op de verpakking?",yes:"Ja, ik zie het",no:"Nee, geen logo",changedBtn:"Het recept is veranderd",photoIng:"Foto van de ingrediënten",photoFront:"Foto van het product",thanks:"Bedankt! Je melding telt mee.",c_seen:"Halallogo gezien door {n} leden",c_notseen:"Geen logo gezien door {n} leden",c_changed:"Recept als gewijzigd gemeld door {n} leden",mine:"Jouw bijdragen: {n}",unknownT:"Onbekend product. Voeg het toe met twee foto's, zonder de pagina te verlaten.",sendLogo:"Foto van het halallogo sturen",sent:"Bedankt, foto ontvangen. Ze wordt gecontroleerd voor ze de fiche aanvult.",sendFail:"Verzenden mislukt. Probeer zo opnieuw.",cert:"Vermelde instantie",certT:"Wie certificeert wat",certL:"De instanties op de verpakkingen, bij de 3 000 meest gescande halalproducten.",follow:"Product volgen",following:"Gevolgd",watchT:"Mijn gevolgde producten",changed:"is veranderd sinds je laatste bezoek",lost:"heeft geen halalvermelding meer",fix:"Fiche aanvullen",changesT:"Vastgestelde wijzigingen",chAdd:"additieven gewijzigd",chIng:"ingrediëntenlijst gewijzigd",byname:"Zoeken op naam is nu overbelast. Typ de cijfers van de barcode of scan.",h1:"Halal of niet?<br><em>Scan.</em> Het antwoord in 2 seconden.",sub:"Richt op de barcode van een product. Je ziet of het een halalvermelding heeft, en elk ingrediënt dat vragen oproept.",camera:"Product scannen",check:"Controleren",photo:"of stuur een foto van de barcode",placeholder:"Barcode of productnaam",
+nl:{placesT:"Halalwinkels en -restaurants",placesL:"Adressen in je buurt die als halal zijn opgegeven. Bevestig of verbeter met één tik.",near:"In mijn buurt",cityPh:"Stad of adres",find:"Zoeken",p_none:"Hier is nog geen als halal opgegeven adres gevonden.",p_src:"Plaatsen opgegeven als halal op OpenStreetMap. Geen certificering door ons.",route:"Route",pc_confirm:"Ik bevestig",pc_not:"Niet meer halal",pc_closed:"Gesloten",geoFail:"Locatie niet beschikbaar. Typ een stad.",t_rest:"Restaurant",t_fast:"Fastfood",t_butcher:"Slagerij",t_shop:"Winkel",helpT:"Help de gemeenschap met één tik",q_logo:"Zie je een halallogo op de verpakking?",yes:"Ja, ik zie het",no:"Nee, geen logo",changedBtn:"Het recept is veranderd",photoIng:"Foto van de ingrediënten",photoFront:"Foto van het product",thanks:"Bedankt! Je melding telt mee.",c_seen:"Halallogo gezien door {n} leden",c_notseen:"Geen logo gezien door {n} leden",c_changed:"Recept als gewijzigd gemeld door {n} leden",mine:"Jouw bijdragen: {n}",unknownT:"Onbekend product. Voeg het toe met twee foto's, zonder de pagina te verlaten.",sendLogo:"Foto van het halallogo sturen",sent:"Bedankt, foto ontvangen. Ze wordt gecontroleerd voor ze de fiche aanvult.",sendFail:"Verzenden mislukt. Probeer zo opnieuw.",cert:"Vermelde instantie",certT:"Wie certificeert wat",certL:"De instanties op de verpakkingen, bij de 3 000 meest gescande halalproducten.",follow:"Product volgen",following:"Gevolgd",watchT:"Mijn gevolgde producten",changed:"is veranderd sinds je laatste bezoek",lost:"heeft geen halalvermelding meer",fix:"Fiche aanvullen",changesT:"Vastgestelde wijzigingen",chAdd:"additieven gewijzigd",chIng:"ingrediëntenlijst gewijzigd",byname:"Zoeken op naam is nu overbelast. Typ de cijfers van de barcode of scan.",h1:"Halal of niet?<br><em>Scan.</em> Het antwoord in 2 seconden.",sub:"Richt op de barcode van een product. Je ziet of het een halalvermelding heeft, en elk ingrediënt dat vragen oproept.",camera:"Product scannen",check:"Controleren",photo:"of stuur een foto van de barcode",placeholder:"Barcode of productnaam",
  t1:"Gratis, zonder account",t2:"Wereldwijde productdatabank",t3:"Meer dan 15 talen",
  loading:"Product zoeken…",notfound:"Dit product staat nog niet in de databank. Voeg het in 1 minuut toe, iedereen heeft er baat bij.",offline:"De productdatabank antwoordt niet. Probeer zo opnieuw.",nocam:"Camera niet beschikbaar op dit toestel. Stuur een foto van de barcode of typ de cijfers.",nobar:"Geen barcode gelezen. Neem de foto van dichterbij.",camhint:"Richt op de barcode, het lezen gaat vanzelf.",
  s_ok:"Halal vermeld",s_bad:"Niet halal",s_conflict:"Halal vermeld, te controleren",s_check:"Na te vragen",s_none:"Geen halalvermelding",s_empty:"Ingrediënten onbekend",
@@ -346,7 +384,7 @@ nl:{helpT:"Help de gemeenschap met één tik",q_logo:"Zie je een halallogo op de
  howT:"Zo werkt het",s1:"Scan",s1p:"De barcode volstaat. Geen account.",s2:"Lees het oordeel",s2p:"Groen, oranje of rood, met de reden in gewone taal.",s3:"Kies beter",s3p:"Producten uit dezelfde afdeling met halalvermelding.",
  legal:"halal.shopping certificeert geen enkel product. We lezen de vermeldingen van de merken en de ingrediëntenlijsten. Bij twijfel gelden de verpakking en de certificerende instantie.",data:"Productgegevens: Open Food Facts, ODbL-licentie.",
  sh:{candies:"Snoep",chocolates:"Chocolade",biscuits:"Koekjes",sausages:"Vleeswaren",meats:"Vlees",cheeses:"Kaas",frozen:"Diepvries",snacks:"Aperitief",beverages:"Dranken"}},
-en:{helpT:"Help the community in one tap",q_logo:"Do you see a halal logo on the pack?",yes:"Yes, I see it",no:"No logo",changedBtn:"The recipe changed",photoIng:"Photo of the ingredients",photoFront:"Photo of the product",thanks:"Thanks! Your report counts.",c_seen:"Halal logo seen by {n} members",c_notseen:"No logo seen by {n} members",c_changed:"Recipe reported changed by {n} members",mine:"Your contributions: {n}",unknownT:"Unknown product. Add it with two photos, without leaving the page.",sendLogo:"Send a photo of the halal logo",sent:"Thanks, photo received. It will be checked before it enriches the record.",sendFail:"Sending failed. Try again in a moment.",cert:"Certifier named",certT:"Who certifies what",certL:"Certifiers named on packs, among the 3,000 most scanned halal products.",follow:"Follow this product",following:"Following",watchT:"My followed products",changed:"has changed since your last visit",lost:"no longer carries a halal claim",fix:"Complete this record",changesT:"Changes detected",chAdd:"additives changed",chIng:"ingredient list changed",byname:"Search by name is overloaded right now. Type the barcode digits or scan.",h1:"Halal or not?<br><em>Scan.</em> The answer in 2 seconds.",sub:"Point at a product's barcode. See whether it carries a halal claim, and every ingredient that raises a question.",camera:"Scan a product",check:"Check",photo:"or send a photo of the barcode",placeholder:"Barcode or product name",
+en:{placesT:"Halal shops and restaurants",placesL:"Places declared halal around you. Confirm or correct in one tap.",near:"Near me",cityPh:"City or address",find:"Search",p_none:"No place declared halal found here yet.",p_src:"Places declared halal on OpenStreetMap. No certification on our part.",route:"Directions",pc_confirm:"I confirm",pc_not:"No longer halal",pc_closed:"Closed",geoFail:"Location unavailable. Type a city.",t_rest:"Restaurant",t_fast:"Fast food",t_butcher:"Butcher",t_shop:"Shop",helpT:"Help the community in one tap",q_logo:"Do you see a halal logo on the pack?",yes:"Yes, I see it",no:"No logo",changedBtn:"The recipe changed",photoIng:"Photo of the ingredients",photoFront:"Photo of the product",thanks:"Thanks! Your report counts.",c_seen:"Halal logo seen by {n} members",c_notseen:"No logo seen by {n} members",c_changed:"Recipe reported changed by {n} members",mine:"Your contributions: {n}",unknownT:"Unknown product. Add it with two photos, without leaving the page.",sendLogo:"Send a photo of the halal logo",sent:"Thanks, photo received. It will be checked before it enriches the record.",sendFail:"Sending failed. Try again in a moment.",cert:"Certifier named",certT:"Who certifies what",certL:"Certifiers named on packs, among the 3,000 most scanned halal products.",follow:"Follow this product",following:"Following",watchT:"My followed products",changed:"has changed since your last visit",lost:"no longer carries a halal claim",fix:"Complete this record",changesT:"Changes detected",chAdd:"additives changed",chIng:"ingredient list changed",byname:"Search by name is overloaded right now. Type the barcode digits or scan.",h1:"Halal or not?<br><em>Scan.</em> The answer in 2 seconds.",sub:"Point at a product's barcode. See whether it carries a halal claim, and every ingredient that raises a question.",camera:"Scan a product",check:"Check",photo:"or send a photo of the barcode",placeholder:"Barcode or product name",
  t1:"Free, no sign-up",t2:"Worldwide product database",t3:"Over 15 languages",
  loading:"Looking up the product…",notfound:"This product is not in the database yet. Add it in 1 minute, it helps everyone.",offline:"The product database is not answering. Try again in a moment.",nocam:"Camera unavailable on this device. Send a photo of the barcode or type the digits.",nobar:"No barcode read. Take the photo closer.",camhint:"Point at the barcode, it reads automatically.",
  s_ok:"Halal claimed",s_bad:"Not halal",s_conflict:"Halal claimed, check it",s_check:"Needs checking",s_none:"No halal claim",s_empty:"Ingredients unknown",
@@ -357,7 +395,7 @@ en:{helpT:"Help the community in one tap",q_logo:"Do you see a halal logo on the
  howT:"How it works",s1:"Scan",s1p:"The barcode is enough. No sign-up.",s2:"Read the verdict",s2p:"Green, amber or red, with the reason in plain words.",s3:"Choose better",s3p:"Products from the same aisle that carry a halal claim.",
  legal:"halal.shopping certifies no product. We read the claims made by brands and the ingredient lists. When in doubt, the pack and the certifying body prevail.",data:"Product data: Open Food Facts, ODbL licence.",
  sh:{candies:"Sweets",chocolates:"Chocolate",biscuits:"Biscuits",sausages:"Cold cuts",meats:"Meat",cheeses:"Cheese",frozen:"Frozen",snacks:"Snacks",beverages:"Drinks"}},
-ar:{helpT:"ساعد المجتمع بلمسة واحدة",q_logo:"هل ترى شعار حلال على العبوة؟",yes:"نعم، أراه",no:"لا، لا يوجد شعار",changedBtn:"تغيّرت المكونات",photoIng:"صورة المكونات",photoFront:"صورة المنتج",thanks:"شكراً! بلاغك محسوب.",c_seen:"شعار الحلال رآه {n} عضواً",c_notseen:"لم يرَ الشعار {n} عضواً",c_changed:"أبلغ {n} عضواً عن تغيّر المكونات",mine:"مساهماتك: {n}",unknownT:"منتج غير معروف. أضفه بصورتين دون مغادرة الصفحة.",sendLogo:"أرسل صورة لشعار الحلال",sent:"شكراً، وصلت الصورة. ستُراجع قبل إضافتها إلى البطاقة.",sendFail:"تعذّر الإرسال. حاول بعد قليل.",cert:"الهيئة المذكورة",certT:"من يمنح الشهادة",certL:"الهيئات المذكورة على العبوات، ضمن أكثر 3000 منتج حلال مسحاً.",follow:"تابع هذا المنتج",following:"متابَع",watchT:"منتجاتي المتابَعة",changed:"تغيّر منذ زيارتك الأخيرة",lost:"لم يعد يحمل إشارة حلال",fix:"أكمل البطاقة",changesT:"تغييرات مرصودة",chAdd:"تغيّرت الإضافات",chIng:"تغيّرت قائمة المكونات",byname:"البحث بالاسم مزدحم حالياً. اكتب أرقام الرمز الشريطي أو امسح.",h1:"حلال أم لا؟<br><em>امسح.</em> الجواب في ثانيتين.",sub:"وجّه الكاميرا نحو الرمز الشريطي. سترى إن كان المنتج يحمل إشارة حلال، وكل مكوّن يثير سؤالاً.",camera:"امسح منتجاً",check:"تحقق",photo:"أو أرسل صورة للرمز الشريطي",placeholder:"الرمز الشريطي أو اسم المنتج",
+ar:{placesT:"متاجر ومطاعم حلال",placesL:"العناوين المعلنة حلالاً بالقرب منك. أكّد أو صحّح بلمسة واحدة.",near:"بالقرب مني",cityPh:"مدينة أو عنوان",find:"بحث",p_none:"لم نجد هنا بعد عناوين معلنة حلالاً.",p_src:"أماكن معلنة حلالاً على OpenStreetMap. لا نمنح أي شهادة.",route:"الاتجاهات",pc_confirm:"أؤكد",pc_not:"لم يعد حلالاً",pc_closed:"مغلق",geoFail:"الموقع غير متاح. اكتب اسم مدينة.",t_rest:"مطعم",t_fast:"وجبات سريعة",t_butcher:"ملحمة",t_shop:"متجر",helpT:"ساعد المجتمع بلمسة واحدة",q_logo:"هل ترى شعار حلال على العبوة؟",yes:"نعم، أراه",no:"لا، لا يوجد شعار",changedBtn:"تغيّرت المكونات",photoIng:"صورة المكونات",photoFront:"صورة المنتج",thanks:"شكراً! بلاغك محسوب.",c_seen:"شعار الحلال رآه {n} عضواً",c_notseen:"لم يرَ الشعار {n} عضواً",c_changed:"أبلغ {n} عضواً عن تغيّر المكونات",mine:"مساهماتك: {n}",unknownT:"منتج غير معروف. أضفه بصورتين دون مغادرة الصفحة.",sendLogo:"أرسل صورة لشعار الحلال",sent:"شكراً، وصلت الصورة. ستُراجع قبل إضافتها إلى البطاقة.",sendFail:"تعذّر الإرسال. حاول بعد قليل.",cert:"الهيئة المذكورة",certT:"من يمنح الشهادة",certL:"الهيئات المذكورة على العبوات، ضمن أكثر 3000 منتج حلال مسحاً.",follow:"تابع هذا المنتج",following:"متابَع",watchT:"منتجاتي المتابَعة",changed:"تغيّر منذ زيارتك الأخيرة",lost:"لم يعد يحمل إشارة حلال",fix:"أكمل البطاقة",changesT:"تغييرات مرصودة",chAdd:"تغيّرت الإضافات",chIng:"تغيّرت قائمة المكونات",byname:"البحث بالاسم مزدحم حالياً. اكتب أرقام الرمز الشريطي أو امسح.",h1:"حلال أم لا؟<br><em>امسح.</em> الجواب في ثانيتين.",sub:"وجّه الكاميرا نحو الرمز الشريطي. سترى إن كان المنتج يحمل إشارة حلال، وكل مكوّن يثير سؤالاً.",camera:"امسح منتجاً",check:"تحقق",photo:"أو أرسل صورة للرمز الشريطي",placeholder:"الرمز الشريطي أو اسم المنتج",
  t1:"مجاني وبدون تسجيل",t2:"قاعدة منتجات عالمية",t3:"أكثر من 15 لغة",
  loading:"جارٍ البحث عن المنتج…",notfound:"هذا المنتج غير موجود بعد في القاعدة. أضفه في دقيقة ليستفيد الجميع.",offline:"قاعدة المنتجات لا تستجيب. حاول بعد قليل.",nocam:"الكاميرا غير متاحة على هذا الجهاز. أرسل صورة للرمز أو اكتب الأرقام.",nobar:"لم يُقرأ أي رمز. التقط الصورة عن قرب.",camhint:"وجّه الكاميرا نحو الرمز، القراءة تلقائية.",
  s_ok:"حلال حسب الشركة",s_bad:"غير حلال",s_conflict:"حلال معلن، يحتاج تحققاً",s_check:"يحتاج تحققاً",s_none:"لا إشارة حلال",s_empty:"المكونات غير معروفة",
@@ -374,6 +412,8 @@ var TRAPS=["e441","e120","e471","e904"];
 
 var L="fr", last=null, shelf="candies";
 function $(id){return document.getElementById(id)}
+function img400(u){return String(u||"").replace(/\.(100|200)\.jpg$/,".400.jpg")}
+function imgFull(u){return String(u||"").replace(/\.(100|200|400)\.jpg$/,".full.jpg")}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function t(k){return (T[L]&&T[L][k])||T.fr[k]||""}
 function addN(k){var x=T[L]&&T[L].adds&&T[L].adds[k];return x?x[0]:(ADD[k].n[L]||ADD[k].n.fr)}
@@ -394,7 +434,7 @@ function paint(l){
   document.querySelectorAll("[data-t]").forEach(function(el){el.textContent=t(el.dataset.t)});
   document.querySelectorAll("[data-th]").forEach(function(el){el.innerHTML=t(el.dataset.th)});
   $("q").placeholder=t("placeholder"); $("lang").value=L;
-  renderShelves(); renderTraps(); renderGuide(); renderCerts(); renderWatch(); renderChanges(); renderMine(); if(SHELFDATA)loadShelf(shelf); if(last)render(last.p,last.r);
+  renderShelves(); renderTraps(); renderGuide(); renderCerts(); renderWatch(); renderChanges(); renderMine(); $("city").placeholder=t("cityPh"); if(PLACES.length)renderPlaces(); if(SHELFDATA)loadShelf(shelf); if(last)render(last.p,last.r);
   document.querySelectorAll(".alert").forEach(function(b){b.textContent=b.dataset.n+" "+t(b.dataset.m)});
 }
 function renderShelves(){
@@ -440,9 +480,9 @@ function render(p,r){
   var c=certOf(p);
   if(c)flags='<div class="flag"><code class="ok">'+esc(t("cert"))+'</code><p><b>'+esc(c.name)+'</b> · '+esc(region(c.country))+(c.url?' · <a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.url.replace(/^https?:\/\/(www\.)?/,""))+'</a>':"")+'</p></div>'+flags;
   if(r.halal)flags='<div class="flag"><code class="ok">'+esc(t("label"))+'</code><p>'+esc(r.certTag.replace(/^[a-z]{2}:/,"").replace(/-/g," "))+'</p></div>'+flags;
-  var img=p.image_front_small_url||p.image_front_url;
+  var img=p.image_front_url||img400(p.image_front_small_url);
   $("out").innerHTML='<article class="answer"><div class="banner '+key+'"><span class="sig"><svg viewBox="0 0 24 24">'+ICON[key]+'</svg></span><div class="btxt"><strong>'+esc(t("s_"+r.status))+'</strong><span>'+esc(t("e_"+r.status))+'</span></div></div>'+
-   '<div class="prod">'+(img?'<img src="'+esc(img)+'" alt="">':"")+'<div style="min-width:0"><h2>'+esc(pname(p))+'</h2><div class="meta">'+esc(brand(p)+(p.code?" · "+p.code:""))+'</div></div></div>'+
+   '<div class="prod">'+(img?'<button type="button" class="zoom" data-zoom="'+esc(imgFull(img))+'"><img src="'+esc(img)+'" alt=""><span class="zi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M8.5 11h5M11 8.5v5"/></svg></span></button>':"")+'<div style="min-width:0"><h2>'+esc(pname(p))+'</h2><div class="meta">'+esc(brand(p)+(p.code?" · "+p.code:""))+'</div></div></div>'+
    (flags?'<div class="flags">'+flags+'</div>':"")+
    helpHTML(p.code)+
    '<div class="acts"><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn solid" id="share">'+esc(t("share"))+'</button><button type="button" class="btn" id="follow">'+esc(watched(p.code)?t("following"):t("follow"))+'</button></span><a class="src" href="https://world.openfoodfacts.org/product/'+esc(p.code)+'" target="_blank" rel="noopener">'+esc(t("source"))+' · Open Food Facts</a></div></article>';
@@ -487,10 +527,66 @@ function sendPhoto(file){
   shrink(file).then(function(blob){var f=new FormData();f.append("code",code);f.append("kind",kind);f.append("lang",L);f.append("photo",blob,code+".jpg");
     return fetch(HSAPI+"/api/collections/contributions/records",{method:"POST",body:f})}).then(function(r){ if(r.ok){markDone(code+":p:"+kind);toast(t("sent"));var b=document.querySelector('[data-photo="'+kind+'"]');if(b)b.classList.add("on")} else toast(t("sendFail")) }).catch(function(){toast(t("sendFail"))});
 }
+// ---------- Places (OpenStreetMap)
+var PLACES=[], PCOUNTS={}, pmap=null, player=null, pcenter=null;
+function dist(a,b,c,d){var R=6371,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180,h=Math.sin(x/2)*Math.sin(x/2)+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)*Math.sin(y/2);return 2*R*Math.asin(Math.sqrt(h))}
+function ptype(g){if(g.shop==="butcher")return "t_butcher";if(g.amenity==="fast_food")return "t_fast";if(g.amenity==="restaurant"||g.amenity==="cafe"||g.amenity==="food_court")return "t_rest";return "t_shop"}
+function pmsg(s){$("pmsg").textContent=s||""}
+function loadLeaflet(){ if(window.L)return Promise.resolve(); return new Promise(function(ok,no){var c=document.createElement("link");c.rel="stylesheet";c.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(c);var j=document.createElement("script");j.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";j.onload=ok;j.onerror=no;document.head.appendChild(j)}) }
+function loadPlaces(lat,lon,radius){
+  pcenter=[lat,lon]; pmsg(t("loading")); radius=radius||4000;
+  var q='[out:json][timeout:25];(nwr["diet:halal"~"^(yes|only)$"](around:'+radius+','+lat+','+lon+');nwr["halal"="yes"](around:'+radius+','+lat+','+lon+');nwr["shop"="butcher"]["butcher"="halal"](around:'+radius+','+lat+','+lon+'););out center tags 150;';
+  var ask=function(host){return fetch(host+"?data="+encodeURIComponent(q)).then(function(r){if(!r.ok)throw 0;return r.json()})};
+  ask("https://overpass-api.de/api/interpreter").catch(function(){return ask("https://overpass.kumi.systems/api/interpreter")}).then(function(j){
+    PLACES=(j.elements||[]).map(function(e){var g=e.tags||{},la=e.lat||(e.center&&e.center.lat),lo=e.lon||(e.center&&e.center.lon);return {id:e.type[0]+e.id,name:g.name,lat:la,lon:lo,type:ptype(g),only:g["diet:halal"]==="only",addr:[g["addr:street"],g["addr:housenumber"]].filter(Boolean).join(" "),city:g["addr:city"]||"",cuisine:(g.cuisine||"").split(";")[0].replace(/_/g," "),d:dist(lat,lon,la,lo)}})
+      .filter(function(p){return p.name&&p.lat}).sort(function(a,b){return a.d-b.d}).slice(0,40);
+    if(!PLACES.length&&radius<20000){loadPlaces(lat,lon,20000);return}
+    pmsg(PLACES.length?"":t("p_none")); renderPlaces(); drawMap(); loadPlaceCounts();
+  }).catch(function(){pmsg(t("offline"))});
+}
+function renderPlaces(){
+  var d=getDone();
+  $("plist").innerHTML=PLACES.map(function(p){
+    function b(kind,key,cls){var on=d["pl:"+p.id+":"+kind],n=(PCOUNTS[p.id]||{})[kind]||0;return '<button type="button" class="pb '+cls+(on?" on":"")+'" data-pl="'+p.id+'" data-pk="'+kind+'"'+((on||!HSAPI_OK)?" disabled":"")+'>'+esc(t(key))+(n?' <i>'+n+'</i>':"")+'</button>'}
+    var km=p.d<1?Math.round(p.d*1000)+" m":p.d.toFixed(1)+" km";
+    return '<div class="pl"><span class="pt">'+esc(t(p.type))+'</span><b>'+esc(p.name)+'</b><span class="pm">'+esc([p.addr,p.city,p.cuisine].filter(Boolean).join(" · "))+(p.addr||p.city||p.cuisine?" · ":"")+km+'</span><div class="pa">'+b("confirm","pc_confirm","c")+b("nothalal","pc_not","n")+b("closed","pc_closed","")+'<a class="pb" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lon+'">'+esc(t("route"))+'</a></div></div>'}).join("");
+}
+function drawMap(){
+  if(!PLACES.length){$("pmap").hidden=true;return}
+  loadLeaflet().then(function(){
+    $("pmap").hidden=false;
+    if(!pmap){pmap=L.map("pmap",{scrollWheelZoom:false});L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(pmap)}
+    if(player)player.remove(); player=L.layerGroup().addTo(pmap);
+    PLACES.forEach(function(p){L.circleMarker([p.lat,p.lon],{radius:8,color:"#0a7550",fillColor:"#34d399",fillOpacity:.9,weight:2}).bindPopup("<b>"+esc(p.name)+"</b>").addTo(player)});
+    L.circleMarker(pcenter,{radius:6,color:"#0f211b",fillColor:"#0f211b",fillOpacity:1}).addTo(player);
+    pmap.fitBounds(PLACES.slice(0,15).map(function(p){return [p.lat,p.lon]}).concat([pcenter]),{padding:[24,24],maxZoom:16}); setTimeout(function(){pmap.invalidateSize()},200);
+  }).catch(function(){});
+}
+function loadPlaceCounts(){
+  if(!HSAPI_OK||!PLACES.length)return;
+  var f=PLACES.slice(0,40).map(function(p){return "osm='"+p.id+"'"}).join("||");
+  fetch(HSAPI+"/api/collections/place_counts/records?perPage=200&filter="+encodeURIComponent("("+f+")")).then(function(r){return r.ok?r.json():null}).then(function(j){
+    if(!j)return; PCOUNTS={}; (j.items||[]).forEach(function(x){(PCOUNTS[x.osm]=PCOUNTS[x.osm]||{})[x.kind]=x.n}); renderPlaces();
+  }).catch(function(){});
+}
+function sendPlace(id,kind,btn){
+  btn.disabled=true;btn.classList.add("on");
+  fetch(HSAPI+"/api/collections/place_signals/records",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({osm:id,kind:kind,device:device(),lang:L})})
+   .then(function(r){ if(r.ok||r.status===400){markDone("pl:"+id+":"+kind);toast(t("thanks"));loadPlaceCounts()} else {btn.disabled=false;btn.classList.remove("on");toast(t("sendFail"))} })
+   .catch(function(){btn.disabled=false;btn.classList.remove("on");toast(t("sendFail"))});
+}
+function nearMe(){
+  if(!navigator.geolocation){pmsg(t("geoFail"));return} pmsg(t("loading"));
+  navigator.geolocation.getCurrentPosition(function(p){loadPlaces(p.coords.latitude,p.coords.longitude)},function(){pmsg(t("geoFail"));$("city").focus()},{timeout:10000,maximumAge:300000});
+}
+function findCity(q){
+  q=String(q||"").trim(); if(!q)return; pmsg(t("loading"));
+  fetch("https://photon.komoot.io/api/?limit=1&q="+encodeURIComponent(q)).then(function(r){return r.json()}).then(function(j){var f=j.features&&j.features[0]; if(!f){pmsg(t("p_none"));return} loadPlaces(f.geometry.coordinates[1],f.geometry.coordinates[0])}).catch(function(){pmsg(t("offline"))});
+}
 var CERTS=null, certSel=null;
 function region(cc){try{return new Intl.DisplayNames([L],{type:"region"}).of(cc)||cc}catch(e){return cc}}
 function certOf(p){ if(!CERTS)return null; var tags=p.labels_tags||[]; for(var i=0;i<CERTS.list.length;i++){var c=CERTS.list[i]; if(c.tags.some(function(x){return tags.indexOf(x)>=0}))return c} return null }
-function tileHTML(x){return '<button type="button" class="tile" data-code="'+esc(x.code)+'"><span class="ph"><img loading="lazy" src="'+esc(x.image_front_small_url)+'" alt=""></span><span class="tag">'+esc(t("s_ok"))+'</span><b>'+esc(pname(x))+'</b><small>'+esc(brand(x))+'</small></button>'}
+function tileHTML(x){return '<button type="button" class="tile" data-code="'+esc(x.code)+'"><span class="ph"><img loading="lazy" src="'+esc(img400(x.image_front_small_url))+'" alt=""></span><span class="tag">'+esc(t("s_ok"))+'</span><b>'+esc(pname(x))+'</b><small>'+esc(brand(x))+'</small></button>'}
 function renderCerts(){
   if(!CERTS)return; var list=CERTS.list.filter(function(c){return c.count>0}); $("certBox").hidden=!list.length;
   $("certs").innerHTML=list.map(function(c){return '<button type="button" class="certc" data-cert="'+c.id+'" aria-pressed="'+(c.id===certSel)+'"><i>'+c.count+'</i><b>'+esc(c.name)+'</b><span>'+esc(region(c.country))+'</span></button>'}).join("");
@@ -525,7 +621,7 @@ function loadShelf(k){
   if(!SHELFDATA)$("grid").innerHTML=new Array(9).join('<div class="skel"></div>');
   shelfData().then(function(j){
     var list=(j.shelves&&j.shelves[k])||[];
-    $("grid").innerHTML=list.length?list.map(function(x){return '<button type="button" class="tile" data-code="'+esc(x.code)+'"><span class="ph"><img loading="lazy" src="'+esc(x.image_front_small_url)+'" alt=""></span><span class="tag">'+esc(t("s_ok"))+'</span><b>'+esc(pname(x))+'</b><small>'+esc(brand(x))+'</small></button>'}).join(""):'<p class="src">'+esc(t("empty"))+'</p>';
+    $("grid").innerHTML=list.length?list.map(function(x){return '<button type="button" class="tile" data-code="'+esc(x.code)+'"><span class="ph"><img loading="lazy" src="'+esc(img400(x.image_front_small_url))+'" alt=""></span><span class="tag">'+esc(t("s_ok"))+'</span><b>'+esc(pname(x))+'</b><small>'+esc(brand(x))+'</small></button>'}).join(""):'<p class="src">'+esc(t("empty"))+'</p>';
   }).catch(function(){ $("grid").innerHTML='<p class="src">'+esc(t("empty"))+'</p>' });
 }
 
@@ -553,6 +649,11 @@ $("f").addEventListener("submit",function(e){e.preventDefault();lookup($("q").va
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-code]"); if(b){lookup(b.dataset.code);return}
   var s=e.target.closest("[data-shelf]"); if(s){loadShelf(s.dataset.shelf);return}
+  var z=e.target.closest("[data-zoom]"); if(z){var im=$("lbi");im.src=z.querySelector("img").src;$("lb").classList.remove("big");$("lb").hidden=false;var hi=new Image();hi.onload=function(){im.src=hi.src};hi.src=z.dataset.zoom;return}
+  if(e.target.id==="lbi"){$("lb").classList.toggle("big");return}
+  if(e.target.closest("#lbx")||e.target.classList.contains("lbs")){$("lb").hidden=true;return}
+  var pk=e.target.closest("[data-pk]"); if(pk){sendPlace(pk.dataset.pl,pk.dataset.pk,pk);return}
+  if(e.target.closest("#near")){nearMe();return}
   var sg=e.target.closest("[data-sig]"); if(sg){sendSignal(sg.dataset.sig,sg);return}
   var pb=e.target.closest("[data-photo]"); if(pb){pendingKind=pb.dataset.photo;$("logoPhoto").click();return}
   var ce=e.target.closest("[data-cert]"); if(ce){certSel=certSel===ce.dataset.cert?null:ce.dataset.cert;renderCerts();return}
@@ -588,8 +689,12 @@ var day=new Date().toISOString().slice(0,10);
 getJSON("data/certifiers.json?d="+day).then(function(j){CERTS=j;renderCerts();if(last)render(last.p,last.r)}).catch(function(){});
 getJSON("data/changes.json?d="+day).then(function(j){CHANGES=j;renderChanges()}).catch(function(){});
 renderWatch(); checkWatch();
+document.addEventListener("keydown",function(e){if(e.key==="Escape")$("lb").hidden=true});
+$("pf").addEventListener("submit",function(e){e.preventDefault();findCity($("city").value)});
+// approximate position from the connection, no permission prompt: the section opens already filled
+fetch("https://ipapi.co/json/").then(function(r){return r.ok?r.json():null}).then(function(j){ if(j&&j.latitude&&!PLACES.length){ if(j.city)$("city").value=j.city; loadPlaces(j.latitude,j.longitude) } }).catch(function(){});
 $("logoPhoto").addEventListener("change",function(e){var f=e.target.files&&e.target.files[0];if(f)sendPhoto(f);e.target.value=""});
-fetch(HSAPI+"/api/health").then(function(r){if(r.ok){HSAPI_OK=true;if(last)render(last.p,last.r)}}).catch(function(){});
+fetch(HSAPI+"/api/health").then(function(r){if(r.ok){HSAPI_OK=true;if(last)render(last.p,last.r);if(PLACES.length){renderPlaces();loadPlaceCounts()}}}).catch(function(){});
 fromHash();
 })();
 </script>

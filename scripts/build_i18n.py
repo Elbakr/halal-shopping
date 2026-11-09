@@ -2,7 +2,8 @@
 import json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 from i18n_src import L, ADD_KEYS
-from i18n_extra import KEYS, X, KEYS2, X2, KEYS3, X3
+from i18n_extra import KEYS, X, KEYS2, X2, KEYS3, X3, KEYS4, X4
+for _c in L: L[_c].update(dict(zip(KEYS4, X4[_c])))
 for _c in L: L[_c].update(dict(zip(KEYS3, X3[_c])))
 for _c in L: L[_c].update(dict(zip(KEYS, X[_c]))); L[_c].update(dict(zip(KEYS2, X2[_c])))
 REQ = ["byname","h1","sub","camera","check","photo","placeholder","t1","t2","t3","loading","notfound","offline","nocam","nobar","camhint",
