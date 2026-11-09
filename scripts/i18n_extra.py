@@ -18,3 +18,23 @@ X = {
 "bn":["উল্লিখিত সংস্থা","কে কী সনদ দেয়","সবচেয়ে বেশি স্ক্যান করা ৩,০০০ হালাল পণ্যের প্যাকেটে লেখা সংস্থাগুলো।","এই পণ্য অনুসরণ করুন","অনুসরণ করছেন","আমার অনুসরণ করা পণ্য","আপনার শেষ ভিজিটের পর বদলেছে","আর হালাল উল্লেখ নেই","তথ্য সম্পূর্ণ করুন","শনাক্ত পরিবর্তন","সংযোজক বদলেছে","উপাদান তালিকা বদলেছে"],
 "ur":["مذکورہ ادارہ","کون کیا تصدیق کرتا ہے","سب سے زیادہ اسکین ہونے والی 3,000 حلال مصنوعات کے پیکٹ پر درج ادارے۔","اس پروڈکٹ کو فالو کریں","فالو ہو رہا ہے","میری فالو کردہ مصنوعات","آپ کے پچھلے دورے کے بعد بدل گیا ہے","اب حلال کا ذکر نہیں","ریکارڈ مکمل کریں","معلوم شدہ تبدیلیاں","اضافی اجزاء بدل گئے","اجزاء کی فہرست بدل گئی"],
 }
+
+KEYS2 = ["sendLogo", "sent", "sendFail"]
+X2 = {
+"fr":["Envoyer une photo du logo halal","Merci, photo reçue. Elle sera vérifiée avant d'enrichir la fiche.","L'envoi n'a pas abouti. Réessayez dans un instant."],
+"nl":["Foto van het halallogo sturen","Bedankt, foto ontvangen. Ze wordt gecontroleerd voor ze de fiche aanvult.","Verzenden mislukt. Probeer zo opnieuw."],
+"en":["Send a photo of the halal logo","Thanks, photo received. It will be checked before it enriches the record.","Sending failed. Try again in a moment."],
+"ar":["أرسل صورة لشعار الحلال","شكراً، وصلت الصورة. ستُراجع قبل إضافتها إلى البطاقة.","تعذّر الإرسال. حاول بعد قليل."],
+"es":["Enviar una foto del logotipo halal","Gracias, foto recibida. Se revisará antes de completar la ficha.","El envío falló. Inténtelo de nuevo en un momento."],
+"pt":["Enviar uma foto do logotipo halal","Obrigado, foto recebida. Será verificada antes de completar a ficha.","O envio falhou. Tente de novo daqui a pouco."],
+"de":["Foto des Halal-Logos senden","Danke, Foto erhalten. Es wird geprüft, bevor es den Datensatz ergänzt.","Senden fehlgeschlagen. Bitte gleich noch einmal versuchen."],
+"tr":["Helal logosunun fotoğrafını gönder","Teşekkürler, fotoğraf alındı. Kayda eklenmeden önce kontrol edilecek.","Gönderilemedi. Birazdan tekrar deneyin."],
+"id":["Kirim foto logo halal","Terima kasih, foto diterima. Akan diperiksa sebelum melengkapi data.","Pengiriman gagal. Coba lagi sebentar lagi."],
+"ms":["Hantar foto logo halal","Terima kasih, foto diterima. Ia akan disemak sebelum melengkapkan rekod.","Penghantaran gagal. Cuba lagi sebentar."],
+"ru":["Отправить фото логотипа халяль","Спасибо, фото получено. Его проверят перед добавлением в карточку.","Не удалось отправить. Попробуйте чуть позже."],
+"zh":["上传清真标志照片","谢谢，照片已收到。审核后将用于完善商品信息。","发送失败，请稍后再试。"],
+"ja":["ハラールロゴの写真を送る","ありがとうございます。写真を受け取りました。確認後に情報へ反映します。","送信できませんでした。少し後にもう一度お試しください。"],
+"hi":["हलाल लोगो की फ़ोटो भेजें","धन्यवाद, फ़ोटो मिल गई। जाँच के बाद इसे जानकारी में जोड़ा जाएगा।","भेजना नहीं हो सका। थोड़ी देर में फिर कोशिश करें।"],
+"bn":["হালাল লোগোর ছবি পাঠান","ধন্যবাদ, ছবি পাওয়া গেছে। যাচাইয়ের পর তথ্যে যোগ হবে।","পাঠানো যায়নি। একটু পরে আবার চেষ্টা করুন।"],
+"ur":["حلال لوگو کی تصویر بھیجیں","شکریہ، تصویر مل گئی۔ جانچ کے بعد ریکارڈ میں شامل ہوگی۔","بھیجنا ممکن نہ ہوا۔ تھوڑی دیر بعد دوبارہ کوشش کریں۔"],
+}
