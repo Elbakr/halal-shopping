@@ -4,9 +4,16 @@ import json, math, os, shutil, sys, time, urllib.parse, urllib.request
 HEADERS = {"User-Agent": "halal.shopping/1.0 (places builder)"}
 HOSTS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter",
          "https://overpass.private.coffee/api/interpreter"]
-Q = """[out:json][timeout:600][maxsize:1073741824];
-(nwr["diet:halal"~"^(yes|only)$"];nwr["halal"="yes"];nwr["shop"="butcher"]["butcher"="halal"];);
-out center tags;"""
+# Cuisines that are halal in the vast majority of venues. These are shown as "to confirm", never as declared.
+LIKELY = ["kebab", "turkish", "pakistani", "lebanese", "moroccan", "arab", "middle_eastern", "afghan", "syrian", "persian",
+          "bangladeshi", "shawarma", "falafel", "tunisian", "algerian", "egyptian", "iraqi", "yemeni", "somali", "uzbek", "uyghur"]
+Q = """[out:json][timeout:900][maxsize:2147483648];
+(nwr["diet:halal"~"^(yes|only)$"];nwr["halal"="yes"];nwr["shop"="butcher"]["butcher"="halal"];
+ nwr["amenity"~"^(restaurant|fast_food|cafe|food_court)$"]["cuisine"~"(^|;) ?(%s)( ?;|$)"];);
+out center tags;""" % "|".join(LIKELY)
+
+def declared(g):
+    return g.get("diet:halal") in ("yes", "only") or g.get("halal") == "yes" or (g.get("shop") == "butcher" and g.get("butcher") == "halal")
 OUT = "data/places"
 
 def fetch():
@@ -14,7 +21,7 @@ def fetch():
         for h in HOSTS:
             try:
                 req = urllib.request.Request(h, data=urllib.parse.urlencode({"data": Q}).encode(), headers=HEADERS)
-                j = json.load(urllib.request.urlopen(req, timeout=900))
+                j = json.load(urllib.request.urlopen(req, timeout=1200))
                 els = j.get("elements") or []
                 print(h, len(els), "elements", flush=True)
                 if els: return els
@@ -36,12 +43,15 @@ def compact(e):
     la, lo = e.get("lat", c.get("lat")), e.get("lon", c.get("lon"))
     if not name or la is None or lo is None: return None
     if not (g.get("amenity") or g.get("shop") or g.get("tourism") or g.get("craft")): return None  # closed or not a venue
+    dec = declared(g)
+    if not dec and (g.get("diet:halal") == "no" or g.get("halal") == "no"): return None  # explicitly not halal
     p = {"i": e["type"][0] + str(e["id"]), "n": name[:80], "la": round(la, 5), "lo": round(lo, 5), "t": kind(g)}
     a = " ".join(x for x in (g.get("addr:street"), g.get("addr:housenumber")) if x)
     if a: p["a"] = a[:80]
     if g.get("addr:city"): p["c"] = g["addr:city"][:40]
     k = (g.get("cuisine") or "").split(";")[0].replace("_", " ").strip()
     if k: p["k"] = k[:30]
+    if not dec: p["p"] = 1  # likely by cuisine, to be confirmed by users
     return p
 
 def main():
@@ -51,7 +61,7 @@ def main():
         p = compact(e)
         if p and p["i"] not in seen:
             seen.add(p["i"]); places.append(p)
-    print(len(places), "named places", flush=True)
+    print(len(places), "named places,", sum(1 for p in places if "p" not in p), "declared", flush=True)
     if len(places) < 1000:
         print("Too few results: keeping the previous files untouched."); sys.exit(0 if os.path.isdir(OUT) else 1)
     tiles = {}
@@ -62,7 +72,7 @@ def main():
     for k, v in tiles.items():
         v.sort(key=lambda p: p["i"])
         json.dump(v, open(f"{tmp}/{k}.json", "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
-    json.dump({"n": len(places), "tiles": {k: len(v) for k, v in sorted(tiles.items())}},
+    json.dump({"n": len(places), "declared": sum(1 for p in places if "p" not in p), "tiles": {k: len(v) for k, v in sorted(tiles.items())}},
               open(f"{tmp}/index.json", "w"), separators=(",", ":"))
     shutil.rmtree(OUT, ignore_errors=True); os.rename(tmp, OUT)
     print(len(tiles), "tiles written")

@@ -98,3 +98,23 @@ X5 = {
 "bn":["রিপোর্ট বাতিল হয়েছে।","ভুল হয়েছে? বাতিল করতে আপনার উত্তরে আবার ট্যাপ করুন।"],
 "ur":["اطلاع منسوخ کر دی گئی۔","غلطی ہوئی؟ منسوخ کرنے کے لیے اپنے جواب پر دوبارہ ٹیپ کریں۔"],
 }
+
+KEYS6 = ["p_maybe","p_conf","p_src"]
+X6 = {
+"fr":["Souvent halal · à confirmer","Confirmé par {n} membres","« Déclaré halal » : indiqué sur OpenStreetMap. « À confirmer » : cuisine habituellement halal, pas encore vérifiée. Votre confirmation fait foi pour les autres. Aucune certification de notre part."],
+"nl":["Vaak halal · te bevestigen","Bevestigd door {n} leden","'Opgegeven als halal': vermeld op OpenStreetMap. 'Te bevestigen': keuken die meestal halal is, nog niet nagekeken. Jouw bevestiging helpt de anderen. Geen certificering door ons."],
+"en":["Often halal · to confirm","Confirmed by {n} members","\"Declared halal\": stated on OpenStreetMap. \"To confirm\": a cuisine that is usually halal, not yet checked. Your confirmation guides others. No certification on our part."],
+"ar":["غالباً حلال · بانتظار التأكيد","أكّده {n} عضواً","«معلن حلالاً»: مذكور في OpenStreetMap. «بانتظار التأكيد»: مطبخ حلال في العادة ولم يُتحقق منه بعد. تأكيدك يفيد الآخرين. لا نمنح أي شهادة."],
+"es":["A menudo halal · por confirmar","Confirmado por {n} miembros","«Declarado halal»: indicado en OpenStreetMap. «Por confirmar»: cocina habitualmente halal, aún sin verificar. Su confirmación orienta a los demás. No certificamos nada."],
+"pt":["Muitas vezes halal · a confirmar","Confirmado por {n} membros","«Declarado halal»: indicado no OpenStreetMap. «A confirmar»: cozinha habitualmente halal, ainda não verificada. A sua confirmação orienta os outros. Não certificamos nada."],
+"de":["Oft halal · zu bestätigen","Bestätigt von {n} Mitgliedern","„Als halal angegeben“: steht in OpenStreetMap. „Zu bestätigen“: Küche, die meist halal ist, noch nicht geprüft. Ihre Bestätigung hilft den anderen. Keine Zertifizierung durch uns."],
+"tr":["Çoğunlukla helal · onay bekliyor","{n} üye onayladı","“Helal olarak bildirildi”: OpenStreetMap'te belirtilmiş. “Onay bekliyor”: genellikle helal olan mutfak, henüz doğrulanmadı. Onayınız başkalarına yol gösterir. Biz sertifika vermiyoruz."],
+"id":["Sering halal · perlu konfirmasi","Dikonfirmasi oleh {n} anggota","“Dinyatakan halal”: tercantum di OpenStreetMap. “Perlu konfirmasi”: masakan yang biasanya halal, belum diperiksa. Konfirmasi Anda membantu yang lain. Kami tidak menyertifikasi."],
+"ms":["Selalunya halal · perlu disahkan","Disahkan oleh {n} ahli","“Diisytiharkan halal”: dinyatakan di OpenStreetMap. “Perlu disahkan”: masakan yang biasanya halal, belum disemak. Pengesahan anda membantu orang lain. Kami tidak mensijilkan."],
+"ru":["Обычно халяль · требует подтверждения","Подтвердили участников: {n}","«Заявлено как халяль»: указано в OpenStreetMap. «Требует подтверждения»: кухня, которая обычно халяльна, ещё не проверено. Ваше подтверждение помогает другим. Мы ничего не сертифицируем."],
+"zh":["通常为清真 · 待确认","{n} 位成员已确认","“标注为清真”：OpenStreetMap 上已注明。“待确认”：通常为清真的菜系，尚未核实。您的确认能帮助他人。本站不作任何认证。"],
+"ja":["多くはハラール · 要確認","{n} 人が確認","「ハラール表示」：OpenStreetMap に記載あり。「要確認」：通常ハラールの料理ですが未確認です。あなたの確認が他の人の助けになります。当サイトは認証しません。"],
+"hi":["अक्सर हलाल · पुष्टि बाकी","{n} सदस्यों ने पुष्टि की","“हलाल घोषित”: OpenStreetMap पर दर्ज। “पुष्टि बाकी”: आम तौर पर हलाल रसोई, अभी जाँची नहीं गई। आपकी पुष्टि दूसरों की मदद करती है। हम कोई प्रमाणन नहीं देते।"],
+"bn":["প্রায়ই হালাল · নিশ্চিত করা বাকি","{n} জন সদস্য নিশ্চিত করেছেন","“হালাল ঘোষিত”: OpenStreetMap-এ উল্লেখ আছে। “নিশ্চিত করা বাকি”: সাধারণত হালাল রান্না, এখনও যাচাই হয়নি। আপনার নিশ্চিতকরণ অন্যদের সাহায্য করে। আমরা কোনো সনদ দিই না।"],
+"ur":["اکثر حلال · تصدیق باقی","{n} ارکان نے تصدیق کی","”حلال قرار دیا گیا“: OpenStreetMap پر درج ہے۔ ”تصدیق باقی“: عموماً حلال کھانا، ابھی جانچا نہیں گیا۔ آپ کی تصدیق دوسروں کی مدد کرتی ہے۔ ہم کوئی تصدیق نہیں دیتے۔"],
+}
