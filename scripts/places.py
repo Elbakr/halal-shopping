@@ -7,28 +7,30 @@ HOSTS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.syste
 # Cuisines that are halal in the vast majority of venues. These are shown as "to confirm", never as declared.
 LIKELY = ["kebab", "turkish", "pakistani", "lebanese", "moroccan", "arab", "middle_eastern", "afghan", "syrian", "persian",
           "bangladeshi", "shawarma", "falafel", "tunisian", "algerian", "egyptian", "iraqi", "yemeni", "somali", "uzbek", "uyghur"]
-Q = """[out:json][timeout:900][maxsize:2147483648];
-(nwr["diet:halal"~"^(yes|only)$"];nwr["halal"="yes"];nwr["shop"="butcher"]["butcher"="halal"];
- nwr["amenity"~"^(restaurant|fast_food|cafe|food_court)$"]["cuisine"~"(^|;) ?(%s)( ?;|$)"];);
-out center tags;""" % "|".join(LIKELY)
+HEAD = "[out:json][timeout:300][maxsize:536870912];"
+Q_DECLARED = HEAD + '(nwr["diet:halal"~"^(yes|only)$"];nwr["halal"="yes"];nwr["shop"="butcher"]["butcher"="halal"];);out center tags;'
+# The likely venues are fetched in a few smaller requests so that no single one is heavy for the public servers.
+Q_LIKELY = [HEAD + '(' + "".join('nwr["amenity"~"^(restaurant|fast_food|cafe|food_court)$"]["cuisine"~"(^|;) ?%s( ?;|$)"];' % c for c in grp) + ');out center tags;'
+            for grp in (LIKELY[0:1], LIKELY[1:2], LIKELY[2:8], LIKELY[8:])]
 
 def declared(g):
     return g.get("diet:halal") in ("yes", "only") or g.get("halal") == "yes" or (g.get("shop") == "butcher" and g.get("butcher") == "halal")
 OUT = "data/places"
 
-def fetch():
-    for attempt in range(3):
+def fetch(q):
+    """Return the elements, or None when every server refused."""
+    for attempt in range(4):
         for h in HOSTS:
             try:
-                req = urllib.request.Request(h, data=urllib.parse.urlencode({"data": Q}).encode(), headers=HEADERS)
-                j = json.load(urllib.request.urlopen(req, timeout=1200))
+                req = urllib.request.Request(h, data=urllib.parse.urlencode({"data": q}).encode(), headers=HEADERS)
+                j = json.load(urllib.request.urlopen(req, timeout=420))
                 els = j.get("elements") or []
-                print(h, len(els), "elements", flush=True)
-                if els: return els
+                print(h, len(els), "elements", (j.get("remark") or "")[:120], flush=True)
+                if els and not j.get("remark"): return els
             except Exception as e:
                 print(h, "failed:", e, flush=True)
-            time.sleep(20)
-    return []
+            time.sleep(30)
+    return None
 
 def kind(g):
     if g.get("shop") == "butcher": return "b"
@@ -55,7 +57,12 @@ def compact(e):
     return p
 
 def main():
-    els = fetch()
+    els = fetch(Q_DECLARED)
+    if els is None: print("Declared places unavailable: keeping the previous files."); sys.exit(0 if os.path.isdir(OUT) else 1)
+    for q in Q_LIKELY:
+        more = fetch(q)
+        if more is None: print("A likely-cuisine request failed: keeping the previous files."); sys.exit(0 if os.path.isdir(OUT) else 1)
+        els += more
     places, seen = [], set()
     for e in els:
         p = compact(e)
