@@ -1,0 +1,10 @@
+[
+ {"id":"acmif","name":"ACMIF · Mosquée d'Évry-Courcouronnes","country":"FR","tags":["fr:controle-de-la-mosquee-d-evry-courcouronnes"]},
+ {"id":"argml","name":"ARGML · Grande Mosquée de Lyon","country":"FR","tags":["fr:association-rituelle-de-la-grande-mosquee-de-lyon"]},
+ {"id":"avs","name":"AVS · À Votre Service","country":"FR","url":"https://www.avs.fr","tags":["fr:a-votre-service"]},
+ {"id":"sfcvh","name":"SFCVH · Grande Mosquée de Paris","country":"FR","tags":["fr:societe-francaise-de-controle-de-viande-halal","en:societe-francaise-de-controle-de-viande-halal-grande-mosquee-de-paris"]},
+ {"id":"hfa","name":"Halal Food Authority (HFA)","country":"GB","url":"https://www.halalfoodauthority.com","tags":["en:halal-food-authority"]},
+ {"id":"cicot","name":"Central Islamic Committee of Thailand (CICOT)","country":"TH","tags":["en:the-central-islamic-committee-of-thailand"]},
+ {"id":"hfce","name":"Halal Food Council of Europe (HFCE)","country":"BE","url":"https://www.hfce.eu","tags":["en:halal-food-council-of-europe"]},
+ {"id":"ifancc","name":"Islamic Food and Nutrition Council of Canada (IFANCC)","country":"CA","tags":["en:islamic-food-and-nutrition-council-of-canada"]}
+]

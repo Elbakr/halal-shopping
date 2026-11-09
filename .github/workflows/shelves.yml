@@ -4,7 +4,7 @@ on:
     - cron: "17 4 * * *"
   workflow_dispatch:
   push:
-    paths: ["scripts/shelves.py", "scripts/registry.py", ".github/workflows/shelves.yml"]
+    paths: ["scripts/shelves.py", "scripts/registry.py", "scripts/certifiers.json", ".github/workflows/shelves.yml"]
 permissions:
   contents: write
 jobs:

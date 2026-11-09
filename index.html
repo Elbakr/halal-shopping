@@ -134,6 +134,18 @@ h2.sec{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,5vw,32p
 .skel{background:linear-gradient(90deg,var(--line),var(--paper),var(--line));background-size:200% 100%;animation:sk 1.2s infinite;border-radius:16px;aspect-ratio:3/4}
 @keyframes sk{to{background-position:-200% 0}}
 
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font:inherit;font-size:14px;font-weight:700;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.certs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.certc{font:inherit;text-align:start;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.certc[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.certc b{font-family:var(--f-display);font-size:16px;line-height:1.2}
+.certc span{font-size:13px;color:var(--muted)}
+.certc i{font-style:normal;font-family:var(--f-mono);font-size:22px;color:var(--go)}
+.alert{border-radius:16px;padding:14px 18px;background:var(--stop-soft);color:var(--stop);font-weight:700;margin-bottom:8px;cursor:pointer;border:0;font:inherit;font-weight:700;text-align:start;width:100%}
+.chlist{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.chrow{font:inherit;text-align:start;color:var(--ink);background:transparent;border:0;border-top:1px solid var(--line);padding:12px 16px;cursor:pointer;display:flex;gap:12px;align-items:baseline}
+.chrow:first-child{border-top:0}.chrow time{font-family:var(--f-mono);font-size:12px;color:var(--muted);flex:none}
 /* Traps */
 .traps{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
 .trap{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:6px}
@@ -189,12 +201,25 @@ footer .in{padding-block:22px calc(28px + env(safe-area-inset-bottom,0px));displ
 
 <main>
   <div class="in">
+    <section id="alerts" hidden></section>
     <section id="out" aria-live="polite" hidden></section>
+    <section id="watchBox" hidden><div class="sechead"><h2 class="sec" data-t="watchT"></h2></div><div class="chips" id="watch"></div></section>
 
     <section>
       <div class="sechead"><h2 class="sec" data-t="shelvesT"></h2><p data-t="shelvesL"></p></div>
       <div class="shelves" id="shelves" role="group"></div>
       <div class="grid" id="grid"></div>
+    </section>
+
+    <section id="certBox" hidden>
+      <div class="sechead"><h2 class="sec" data-t="certT"></h2><p data-t="certL"></p></div>
+      <div class="certs" id="certs"></div>
+      <div class="grid" id="certgrid" style="margin-top:14px"></div>
+    </section>
+
+    <section id="chBox" hidden>
+      <div class="sechead"><h2 class="sec" data-t="changesT"></h2></div>
+      <div class="chlist" id="chlist"></div>
     </section>
 
     <section>
@@ -285,7 +310,7 @@ function analyse(p){
 
 // ---------- Text ----------
 var T={
-fr:{byname:"La recherche par nom est saturée en ce moment. Tapez les chiffres du code-barres ou scannez.",h1:"Halal ou pas ?<br><em>Scannez.</em> La réponse en 2 secondes.",sub:"Visez le code-barres d'un produit. Vous voyez s'il porte une mention halal, et chaque ingrédient qui pose question.",camera:"Scanner un produit",check:"Vérifier",photo:"ou envoyer une photo du code-barres",placeholder:"Code-barres ou nom du produit",
+fr:{cert:"Organisme cité",certT:"Qui certifie quoi",certL:"Les organismes cités sur les emballages, parmi les 3 000 produits halal les plus scannés.",follow:"Suivre ce produit",following:"Suivi",watchT:"Mes produits suivis",changed:"a changé depuis votre dernière visite",lost:"ne porte plus de mention halal",fix:"Compléter la fiche",changesT:"Changements détectés",chAdd:"additifs modifiés",chIng:"liste d'ingrédients modifiée",byname:"La recherche par nom est saturée en ce moment. Tapez les chiffres du code-barres ou scannez.",h1:"Halal ou pas ?<br><em>Scannez.</em> La réponse en 2 secondes.",sub:"Visez le code-barres d'un produit. Vous voyez s'il porte une mention halal, et chaque ingrédient qui pose question.",camera:"Scanner un produit",check:"Vérifier",photo:"ou envoyer une photo du code-barres",placeholder:"Code-barres ou nom du produit",
  t1:"Gratuit, sans inscription",t2:"Base mondiale de produits",t3:"Plus de 15 langues",
  loading:"Recherche du produit…",notfound:"Ce produit n'est pas encore dans la base. Ajoutez-le en 1 minute, il servira à tout le monde.",offline:"La base produits ne répond pas. Réessayez dans un instant.",nocam:"Caméra indisponible sur cet appareil. Envoyez une photo du code-barres ou tapez les chiffres.",nobar:"Aucun code-barres lu. Reprenez la photo plus près.",camhint:"Visez le code-barres, la lecture est automatique.",
  s_ok:"Halal déclaré",s_bad:"Pas halal",s_conflict:"Halal déclaré, à contrôler",s_check:"À vérifier",s_none:"Aucune mention halal",s_empty:"Ingrédients inconnus",
@@ -296,7 +321,7 @@ fr:{byname:"La recherche par nom est saturée en ce moment. Tapez les chiffres d
  howT:"Comment ça marche",s1:"Scannez",s1p:"Le code-barres suffit. Aucune inscription.",s2:"Lisez le verdict",s2p:"Vert, orange ou rouge, avec la raison écrite en clair.",s3:"Choisissez mieux",s3p:"Des produits du même rayon qui déclarent une mention halal.",
  legal:"halal.shopping ne certifie aucun produit. Nous lisons les mentions déclarées par les marques et les listes d'ingrédients. En cas de doute, l'emballage et l'organisme certificateur font foi.",data:"Données produits : Open Food Facts, licence ODbL.",
  sh:{candies:"Bonbons",chocolates:"Chocolats",biscuits:"Biscuits",sausages:"Charcuterie",meats:"Viandes",cheeses:"Fromages",frozen:"Surgelés",snacks:"Apéritif",beverages:"Boissons"}},
-nl:{byname:"Zoeken op naam is nu overbelast. Typ de cijfers van de barcode of scan.",h1:"Halal of niet?<br><em>Scan.</em> Het antwoord in 2 seconden.",sub:"Richt op de barcode van een product. Je ziet of het een halalvermelding heeft, en elk ingrediënt dat vragen oproept.",camera:"Product scannen",check:"Controleren",photo:"of stuur een foto van de barcode",placeholder:"Barcode of productnaam",
+nl:{cert:"Vermelde instantie",certT:"Wie certificeert wat",certL:"De instanties op de verpakkingen, bij de 3 000 meest gescande halalproducten.",follow:"Product volgen",following:"Gevolgd",watchT:"Mijn gevolgde producten",changed:"is veranderd sinds je laatste bezoek",lost:"heeft geen halalvermelding meer",fix:"Fiche aanvullen",changesT:"Vastgestelde wijzigingen",chAdd:"additieven gewijzigd",chIng:"ingrediëntenlijst gewijzigd",byname:"Zoeken op naam is nu overbelast. Typ de cijfers van de barcode of scan.",h1:"Halal of niet?<br><em>Scan.</em> Het antwoord in 2 seconden.",sub:"Richt op de barcode van een product. Je ziet of het een halalvermelding heeft, en elk ingrediënt dat vragen oproept.",camera:"Product scannen",check:"Controleren",photo:"of stuur een foto van de barcode",placeholder:"Barcode of productnaam",
  t1:"Gratis, zonder account",t2:"Wereldwijde productdatabank",t3:"Meer dan 15 talen",
  loading:"Product zoeken…",notfound:"Dit product staat nog niet in de databank. Voeg het in 1 minuut toe, iedereen heeft er baat bij.",offline:"De productdatabank antwoordt niet. Probeer zo opnieuw.",nocam:"Camera niet beschikbaar op dit toestel. Stuur een foto van de barcode of typ de cijfers.",nobar:"Geen barcode gelezen. Neem de foto van dichterbij.",camhint:"Richt op de barcode, het lezen gaat vanzelf.",
  s_ok:"Halal vermeld",s_bad:"Niet halal",s_conflict:"Halal vermeld, te controleren",s_check:"Na te vragen",s_none:"Geen halalvermelding",s_empty:"Ingrediënten onbekend",
@@ -307,7 +332,7 @@ nl:{byname:"Zoeken op naam is nu overbelast. Typ de cijfers van de barcode of sc
  howT:"Zo werkt het",s1:"Scan",s1p:"De barcode volstaat. Geen account.",s2:"Lees het oordeel",s2p:"Groen, oranje of rood, met de reden in gewone taal.",s3:"Kies beter",s3p:"Producten uit dezelfde afdeling met halalvermelding.",
  legal:"halal.shopping certificeert geen enkel product. We lezen de vermeldingen van de merken en de ingrediëntenlijsten. Bij twijfel gelden de verpakking en de certificerende instantie.",data:"Productgegevens: Open Food Facts, ODbL-licentie.",
  sh:{candies:"Snoep",chocolates:"Chocolade",biscuits:"Koekjes",sausages:"Vleeswaren",meats:"Vlees",cheeses:"Kaas",frozen:"Diepvries",snacks:"Aperitief",beverages:"Dranken"}},
-en:{byname:"Search by name is overloaded right now. Type the barcode digits or scan.",h1:"Halal or not?<br><em>Scan.</em> The answer in 2 seconds.",sub:"Point at a product's barcode. See whether it carries a halal claim, and every ingredient that raises a question.",camera:"Scan a product",check:"Check",photo:"or send a photo of the barcode",placeholder:"Barcode or product name",
+en:{cert:"Certifier named",certT:"Who certifies what",certL:"Certifiers named on packs, among the 3,000 most scanned halal products.",follow:"Follow this product",following:"Following",watchT:"My followed products",changed:"has changed since your last visit",lost:"no longer carries a halal claim",fix:"Complete this record",changesT:"Changes detected",chAdd:"additives changed",chIng:"ingredient list changed",byname:"Search by name is overloaded right now. Type the barcode digits or scan.",h1:"Halal or not?<br><em>Scan.</em> The answer in 2 seconds.",sub:"Point at a product's barcode. See whether it carries a halal claim, and every ingredient that raises a question.",camera:"Scan a product",check:"Check",photo:"or send a photo of the barcode",placeholder:"Barcode or product name",
  t1:"Free, no sign-up",t2:"Worldwide product database",t3:"Over 15 languages",
  loading:"Looking up the product…",notfound:"This product is not in the database yet. Add it in 1 minute, it helps everyone.",offline:"The product database is not answering. Try again in a moment.",nocam:"Camera unavailable on this device. Send a photo of the barcode or type the digits.",nobar:"No barcode read. Take the photo closer.",camhint:"Point at the barcode, it reads automatically.",
  s_ok:"Halal claimed",s_bad:"Not halal",s_conflict:"Halal claimed, check it",s_check:"Needs checking",s_none:"No halal claim",s_empty:"Ingredients unknown",
@@ -318,7 +343,7 @@ en:{byname:"Search by name is overloaded right now. Type the barcode digits or s
  howT:"How it works",s1:"Scan",s1p:"The barcode is enough. No sign-up.",s2:"Read the verdict",s2p:"Green, amber or red, with the reason in plain words.",s3:"Choose better",s3p:"Products from the same aisle that carry a halal claim.",
  legal:"halal.shopping certifies no product. We read the claims made by brands and the ingredient lists. When in doubt, the pack and the certifying body prevail.",data:"Product data: Open Food Facts, ODbL licence.",
  sh:{candies:"Sweets",chocolates:"Chocolate",biscuits:"Biscuits",sausages:"Cold cuts",meats:"Meat",cheeses:"Cheese",frozen:"Frozen",snacks:"Snacks",beverages:"Drinks"}},
-ar:{byname:"البحث بالاسم مزدحم حالياً. اكتب أرقام الرمز الشريطي أو امسح.",h1:"حلال أم لا؟<br><em>امسح.</em> الجواب في ثانيتين.",sub:"وجّه الكاميرا نحو الرمز الشريطي. سترى إن كان المنتج يحمل إشارة حلال، وكل مكوّن يثير سؤالاً.",camera:"امسح منتجاً",check:"تحقق",photo:"أو أرسل صورة للرمز الشريطي",placeholder:"الرمز الشريطي أو اسم المنتج",
+ar:{cert:"الهيئة المذكورة",certT:"من يمنح الشهادة",certL:"الهيئات المذكورة على العبوات، ضمن أكثر 3000 منتج حلال مسحاً.",follow:"تابع هذا المنتج",following:"متابَع",watchT:"منتجاتي المتابَعة",changed:"تغيّر منذ زيارتك الأخيرة",lost:"لم يعد يحمل إشارة حلال",fix:"أكمل البطاقة",changesT:"تغييرات مرصودة",chAdd:"تغيّرت الإضافات",chIng:"تغيّرت قائمة المكونات",byname:"البحث بالاسم مزدحم حالياً. اكتب أرقام الرمز الشريطي أو امسح.",h1:"حلال أم لا؟<br><em>امسح.</em> الجواب في ثانيتين.",sub:"وجّه الكاميرا نحو الرمز الشريطي. سترى إن كان المنتج يحمل إشارة حلال، وكل مكوّن يثير سؤالاً.",camera:"امسح منتجاً",check:"تحقق",photo:"أو أرسل صورة للرمز الشريطي",placeholder:"الرمز الشريطي أو اسم المنتج",
  t1:"مجاني وبدون تسجيل",t2:"قاعدة منتجات عالمية",t3:"أكثر من 15 لغة",
  loading:"جارٍ البحث عن المنتج…",notfound:"هذا المنتج غير موجود بعد في القاعدة. أضفه في دقيقة ليستفيد الجميع.",offline:"قاعدة المنتجات لا تستجيب. حاول بعد قليل.",nocam:"الكاميرا غير متاحة على هذا الجهاز. أرسل صورة للرمز أو اكتب الأرقام.",nobar:"لم يُقرأ أي رمز. التقط الصورة عن قرب.",camhint:"وجّه الكاميرا نحو الرمز، القراءة تلقائية.",
  s_ok:"حلال حسب الشركة",s_bad:"غير حلال",s_conflict:"حلال معلن، يحتاج تحققاً",s_check:"يحتاج تحققاً",s_none:"لا إشارة حلال",s_empty:"المكونات غير معروفة",
@@ -355,7 +380,8 @@ function paint(l){
   document.querySelectorAll("[data-t]").forEach(function(el){el.textContent=t(el.dataset.t)});
   document.querySelectorAll("[data-th]").forEach(function(el){el.innerHTML=t(el.dataset.th)});
   $("q").placeholder=t("placeholder"); $("lang").value=L;
-  renderShelves(); renderTraps(); renderGuide(); if(SHELFDATA)loadShelf(shelf); if(last)render(last.p,last.r);
+  renderShelves(); renderTraps(); renderGuide(); renderCerts(); renderWatch(); renderChanges(); if(SHELFDATA)loadShelf(shelf); if(last)render(last.p,last.r);
+  document.querySelectorAll(".alert").forEach(function(b){b.textContent=b.dataset.n+" "+t(b.dataset.m)});
 }
 function renderShelves(){
   $("shelves").innerHTML=SHELVES.map(function(s){return '<button type="button" class="shelf" data-shelf="'+s[0]+'" aria-pressed="'+(s[0]===shelf)+'">'+esc((T[L].sh&&T[L].sh[s[0]])||T.fr.sh[s[0]])+'</button>'}).join("");
@@ -397,12 +423,15 @@ function render(p,r){
     var why=f.type==="add"?addW(f.key):wordW(f.key);
     var nm=f.type==="add"?addN(f.key)+" : ":"";
     return '<div class="flag"><code class="'+f.lvl+'">'+esc(f.code)+'</code><p>'+esc(nm+why)+'</p></div>'}).join("");
+  var c=certOf(p);
+  if(c)flags='<div class="flag"><code class="ok">'+esc(t("cert"))+'</code><p><b>'+esc(c.name)+'</b> · '+esc(region(c.country))+(c.url?' · <a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.url.replace(/^https?:\/\/(www\.)?/,""))+'</a>':"")+'</p></div>'+flags;
   if(r.halal)flags='<div class="flag"><code class="ok">'+esc(t("label"))+'</code><p>'+esc(r.certTag.replace(/^[a-z]{2}:/,"").replace(/-/g," "))+'</p></div>'+flags;
   var img=p.image_front_small_url||p.image_front_url;
   $("out").innerHTML='<article class="answer"><div class="banner '+key+'"><span class="sig"><svg viewBox="0 0 24 24">'+ICON[key]+'</svg></span><div class="btxt"><strong>'+esc(t("s_"+r.status))+'</strong><span>'+esc(t("e_"+r.status))+'</span></div></div>'+
    '<div class="prod">'+(img?'<img src="'+esc(img)+'" alt="">':"")+'<div style="min-width:0"><h2>'+esc(pname(p))+'</h2><div class="meta">'+esc(brand(p)+(p.code?" · "+p.code:""))+'</div></div></div>'+
    (flags?'<div class="flags">'+flags+'</div>':"")+
-   '<div class="acts"><button type="button" class="btn solid" id="share">'+esc(t("share"))+'</button><a class="src" href="https://world.openfoodfacts.org/product/'+esc(p.code)+'" target="_blank" rel="noopener">'+esc(t("source"))+' · Open Food Facts</a></div></article>';
+   '<div class="acts"><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn solid" id="share">'+esc(t("share"))+'</button><button type="button" class="btn" id="follow">'+esc(watched(p.code)?t("following"):t("follow"))+'</button><a class="btn" href="https://world.openfoodfacts.org/cgi/product.pl?type=edit&code='+esc(p.code)+'" target="_blank" rel="noopener">'+esc(t("fix"))+'</a></span><a class="src" href="https://world.openfoodfacts.org/product/'+esc(p.code)+'" target="_blank" rel="noopener">'+esc(t("source"))+' · Open Food Facts</a></div></article>';
+  $("follow").onclick=function(){var w=getWatch();if(w[p.code])delete w[p.code];else w[p.code]=sigOf(p,r);setWatch(w);this.textContent=w[p.code]?t("following"):t("follow");renderWatch()};
   $("share").onclick=function(){
     var url="https://halal.shopping/#p"+p.code, title=pname(p)+" — "+t("s_"+r.status);
     if(navigator.share){navigator.share({title:title,url:url}).catch(function(){})}
@@ -410,6 +439,37 @@ function render(p,r){
   };
 }
 
+var CERTS=null, certSel=null;
+function region(cc){try{return new Intl.DisplayNames([L],{type:"region"}).of(cc)||cc}catch(e){return cc}}
+function certOf(p){ if(!CERTS)return null; var tags=p.labels_tags||[]; for(var i=0;i<CERTS.list.length;i++){var c=CERTS.list[i]; if(c.tags.some(function(x){return tags.indexOf(x)>=0}))return c} return null }
+function tileHTML(x){return '<button type="button" class="tile" data-code="'+esc(x.code)+'"><span class="ph"><img loading="lazy" src="'+esc(x.image_front_small_url)+'" alt=""></span><span class="tag">'+esc(t("s_ok"))+'</span><b>'+esc(pname(x))+'</b><small>'+esc(brand(x))+'</small></button>'}
+function renderCerts(){
+  if(!CERTS)return; var list=CERTS.list.filter(function(c){return c.count>0}); $("certBox").hidden=!list.length;
+  $("certs").innerHTML=list.map(function(c){return '<button type="button" class="certc" data-cert="'+c.id+'" aria-pressed="'+(c.id===certSel)+'"><i>'+c.count+'</i><b>'+esc(c.name)+'</b><span>'+esc(region(c.country))+'</span></button>'}).join("");
+  var sel=list.filter(function(c){return c.id===certSel})[0];
+  $("certgrid").innerHTML=sel?sel.products.map(tileHTML).join(""):"";
+}
+function getWatch(){try{return JSON.parse(store("hs_watch")||"{}")||{}}catch(e){return {}}}
+function setWatch(w){store("hs_watch",JSON.stringify(w))}
+function watched(c){return !!getWatch()[c]}
+function sigOf(p,r){return {n:pname(p),h:r.halal,a:r.flags.filter(function(f){return f.lvl!=="info"}).map(function(f){return f.code}).sort().join(",")}}
+function renderWatch(){var w=getWatch(),k=Object.keys(w);$("watchBox").hidden=!k.length;$("watch").innerHTML=k.map(function(c){return '<button type="button" class="chip" data-code="'+esc(c)+'">'+esc(w[c].n||c)+'</button>'}).join("")}
+function checkWatch(){
+  var w=getWatch(),codes=Object.keys(w).slice(0,20),alerts=[]; if(!codes.length)return;
+  Promise.all(codes.map(function(c){return getJSON(API+"/api/v2/product/"+c+"?fields="+FIELDS).then(function(j){
+    if(!j||j.status!==1)return; var r=analyse(j.product),s=sigOf(j.product,r),o=w[c];
+    if(o.h&&!s.h)alerts.push({c:c,n:s.n,m:"lost"}); else if(o.a!==s.a)alerts.push({c:c,n:s.n,m:"changed"});
+    w[c]=s;
+  }).catch(function(){})})).then(function(){
+    setWatch(w); if(!alerts.length)return; $("alerts").hidden=false;
+    $("alerts").innerHTML=alerts.map(function(a){return '<button type="button" class="alert" data-code="'+esc(a.c)+'" data-m="'+a.m+'" data-n="'+esc(a.n)+'">'+esc(a.n+" "+t(a.m))+'</button>'}).join("");
+  });
+}
+var CHANGES=null;
+function renderChanges(){
+  if(!CHANGES)return; var l=(CHANGES.changes||[]).slice(0,12); $("chBox").hidden=!l.length;
+  $("chlist").innerHTML=l.map(function(x){return '<button type="button" class="chrow" data-code="'+esc(x.c)+'"><time>'+esc(x.d)+'</time><span><b>'+esc(x.n||x.c)+'</b> · '+esc(t(x.t==="additives"?"chAdd":"chIng"))+'</span></button>'}).join("");
+}
 var SHELFDATA=null;
 function shelfData(){ if(SHELFDATA)return Promise.resolve(SHELFDATA); return getJSON("data/shelves.json?d="+new Date().toISOString().slice(0,10)).then(function(j){SHELFDATA=j;return j}) }
 function loadShelf(k){
@@ -445,6 +505,7 @@ $("f").addEventListener("submit",function(e){e.preventDefault();lookup($("q").va
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-code]"); if(b){lookup(b.dataset.code);return}
   var s=e.target.closest("[data-shelf]"); if(s){loadShelf(s.dataset.shelf);return}
+  var ce=e.target.closest("[data-cert]"); if(ce){certSel=certSel===ce.dataset.cert?null:ce.dataset.cert;renderCerts();return}
 });
 function fromHash(){var m=location.hash.match(/^#p(\d{8,14})$/); if(m)lookup(m[1],false)}
 window.addEventListener("hashchange",fromHash);
@@ -473,6 +534,10 @@ if(!urlLang&&!chosen){
    .then(function(c){ if(!c)return; c=String(c).toUpperCase(); var l=pickFor(c); if(l!==L)applyLang(l) }).catch(function(){});
 }
 loadShelf("candies");
+var day=new Date().toISOString().slice(0,10);
+getJSON("data/certifiers.json?d="+day).then(function(j){CERTS=j;renderCerts();if(last)render(last.p,last.r)}).catch(function(){});
+getJSON("data/changes.json?d="+day).then(function(j){CHANGES=j;renderChanges()}).catch(function(){});
+renderWatch(); checkWatch();
 fromHash();
 })();
 </script>

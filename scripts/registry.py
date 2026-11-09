@@ -14,10 +14,13 @@ def search(q, page, size, fields):
 
 # ---- 1. label statistics over the most scanned halal-claimed products
 labels, brands_by_label, total = Counter(), {}, 0
+CERTS = json.load(open("scripts/certifiers.json", encoding="utf-8"))
+for c in CERTS:
+    c["count"] = 0; c["products"] = []
 tracked = {}
 for page in range(1, 31):
     try:
-        j = search('labels_tags:"en:halal"', page, 100, "code,labels_tags,additives_tags,ingredients_text,product_name,brands")
+        j = search('labels_tags:"en:halal"', page, 100, "code,labels_tags,additives_tags,ingredients_text,product_name,product_name_fr,product_name_en,brands,image_front_small_url")
     except Exception as e:
         print("page", page, "failed", e); break
     hits = j.get("hits", [])
@@ -26,6 +29,14 @@ for page in range(1, 31):
         total += 1
         for t in h.get("labels_tags") or []:
             labels[t] += 1
+        for c in CERTS:
+            if set(c["tags"]) & set(h.get("labels_tags") or []):
+                c["count"] += 1
+                if len(c["products"]) < 12 and h.get("image_front_small_url") and (h.get("product_name_fr") or h.get("product_name")):
+                    b = h.get("brands")
+                    c["products"].append({"code": h["code"], "product_name": h.get("product_name") or "", "product_name_fr": h.get("product_name_fr") or "",
+                                          "product_name_en": h.get("product_name_en") or "", "brands": ", ".join(b) if isinstance(b, list) else (b or ""),
+                                          "image_front_small_url": h["image_front_small_url"]})
         if len(tracked) < 1500 and h.get("code"):
             ing = (h.get("ingredients_text") or "").strip().lower()
             tracked[h["code"]] = {
@@ -40,6 +51,7 @@ if total == 0:
 json.dump({"updated": TODAY, "products": total, "labels": labels.most_common(400)},
           open("data/labels_stats.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 print("products", total, "distinct labels", len(labels))
+json.dump({"updated": TODAY, "sample": total, "list": sorted(CERTS, key=lambda c: -c["count"])}, open("data/certifiers.json", "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 
 # ---- 2. change detection against yesterday's snapshot
 old = {}

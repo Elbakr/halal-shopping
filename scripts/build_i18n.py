@@ -2,6 +2,8 @@
 import json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 from i18n_src import L, ADD_KEYS
+from i18n_extra import KEYS, X
+for _c in L: L[_c].update(dict(zip(KEYS, X[_c])))
 REQ = ["byname","h1","sub","camera","check","photo","placeholder","t1","t2","t3","loading","notfound","offline","nocam","nobar","camhint",
        "s_ok","s_bad","s_conflict","s_check","s_none","s_empty","e_ok","e_bad","e_conflict","e_check","e_none","e_empty",
        "label","share","copied","source","add","shelvesT","shelvesL","empty","trapsT","trapsL","allAdd","howT","s1","s1p","s2","s2p","s3","s3p","legal","data"]
