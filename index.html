@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://world.openfoodfacts.org">
+<link rel="preconnect" href="https://search.openfoodfacts.org">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&family=Noto+Kufi+Arabic:wght@400;700;800&display=swap">
 <style>
 /* Layout: a dark hero band holding the scanner (the product), then the answer as a full-colour banner, then shelves of real halal-claimed products to browse, then the traps to know. */
@@ -342,7 +343,8 @@ function renderGuide(){
 }
 
 // ---------- Data ----------
-var API="https://world.openfoodfacts.org";
+var API="https://world.openfoodfacts.org", SEARCH="https://search.openfoodfacts.org/search";
+function brand(x){return Array.isArray(x.brands)?x.brands.join(", "):(x.brands||"")}
 var FIELDS="code,product_name,product_name_fr,product_name_nl,product_name_en,brands,image_front_small_url,image_front_url,labels_tags,additives_tags,ingredients_text,ingredients_text_fr,ingredients_text_en,categories_tags";
 function getJSON(u){return fetch(u).then(function(r){if(!r.ok)throw new Error("http "+r.status);return r.json()})}
 function pname(p){return p["product_name_"+L]||p.product_name_fr||p.product_name||p.product_name_en||p.code}
@@ -352,7 +354,7 @@ function lookup(q,push){
   q=String(q||"").trim(); if(!q)return; $("q").value=q; msg(t("loading"));
   var isCode=/^\d{8,14}$/.test(q);
   var req=isCode? getJSON(API+"/api/v2/product/"+q+"?fields="+FIELDS).then(function(j){return j&&j.status===1?j.product:null})
-               : getJSON(API+"/cgi/search.pl?search_terms="+encodeURIComponent(q)+"&search_simple=1&json=1&page_size=1&fields="+FIELDS).then(function(j){return j&&j.products&&j.products[0]||null});
+               : getJSON(SEARCH+"?q="+encodeURIComponent(q)+"&page_size=1&sort_by=-unique_scans_n&fields=code").then(function(j){var c=j&&j.hits&&j.hits[0]&&j.hits[0].code;return c?getJSON(API+"/api/v2/product/"+c+"?fields="+FIELDS).then(function(k){return k&&k.status===1?k.product:null}):null});
   req.then(function(p){
     msg(""); var out=$("out"); out.hidden=false;
     if(!p){last=null;out.innerHTML='<div class="note">'+esc(t("notfound"))+' <a href="https://world.openfoodfacts.org/cgi/product.pl'+(isCode?"?code="+q+"&type=add":"")+'" target="_blank" rel="noopener"><b>'+esc(t("add"))+'</b></a></div>';out.scrollIntoView({behavior:"smooth"});return}
@@ -372,7 +374,7 @@ function render(p,r){
   if(r.halal)flags='<div class="flag"><code class="ok">'+esc(t("label"))+'</code><p>'+esc(r.certTag.replace(/^[a-z]{2}:/,"").replace(/-/g," "))+'</p></div>'+flags;
   var img=p.image_front_small_url||p.image_front_url;
   $("out").innerHTML='<article class="answer"><div class="banner '+key+'"><span class="sig"><svg viewBox="0 0 24 24">'+ICON[key]+'</svg></span><div class="btxt"><strong>'+esc(t("s_"+r.status))+'</strong><span>'+esc(t("e_"+r.status))+'</span></div></div>'+
-   '<div class="prod">'+(img?'<img src="'+esc(img)+'" alt="">':"")+'<div style="min-width:0"><h2>'+esc(pname(p))+'</h2><div class="meta">'+esc((p.brands||"")+(p.code?" · "+p.code:""))+'</div></div></div>'+
+   '<div class="prod">'+(img?'<img src="'+esc(img)+'" alt="">':"")+'<div style="min-width:0"><h2>'+esc(pname(p))+'</h2><div class="meta">'+esc(brand(p)+(p.code?" · "+p.code:""))+'</div></div></div>'+
    (flags?'<div class="flags">'+flags+'</div>':"")+
    '<div class="acts"><button type="button" class="btn solid" id="share">'+esc(t("share"))+'</button><a class="src" href="https://world.openfoodfacts.org/product/'+esc(p.code)+'" target="_blank" rel="noopener">'+esc(t("source"))+' · Open Food Facts</a></div></article>';
   $("share").onclick=function(){
@@ -386,10 +388,10 @@ var shelfReq=0;
 function loadShelf(k){
   shelf=k; renderShelves(); var id=++shelfReq; var cat=SHELVES.filter(function(s){return s[0]===k})[0][1];
   $("grid").innerHTML=new Array(8).join('<div class="skel"></div>');
-  getJSON(API+"/api/v2/search?categories_tags="+encodeURIComponent(cat)+"&labels_tags=en:halal&page_size=24&sort_by=unique_scans_n&fields=code,product_name,product_name_fr,product_name_nl,product_name_en,brands,image_front_small_url").then(function(j){
+  getJSON(SEARCH+"?q="+encodeURIComponent('categories_tags:"'+cat+'" AND labels_tags:"en:halal"')+"&page_size=24&sort_by=-unique_scans_n&fields=code,product_name,product_name_fr,product_name_nl,product_name_en,brands,image_front_small_url").then(function(j){
     if(id!==shelfReq)return;
-    var list=(j.products||[]).filter(function(x){return x.image_front_small_url&&(x.product_name||x.product_name_fr||x.product_name_en)}).slice(0,12);
-    $("grid").innerHTML=list.length?list.map(function(x){return '<button type="button" class="tile" data-code="'+esc(x.code)+'"><span class="ph"><img loading="lazy" src="'+esc(x.image_front_small_url)+'" alt=""></span><span class="tag">'+esc(t("s_ok"))+'</span><b>'+esc(pname(x))+'</b><small>'+esc(x.brands||"")+'</small></button>'}).join(""):'<p class="src">'+esc(t("empty"))+'</p>';
+    var list=(j.hits||[]).filter(function(x){return x.image_front_small_url&&(x.product_name||x.product_name_fr||x.product_name_en)}).slice(0,12);
+    $("grid").innerHTML=list.length?list.map(function(x){return '<button type="button" class="tile" data-code="'+esc(x.code)+'"><span class="ph"><img loading="lazy" src="'+esc(x.image_front_small_url)+'" alt=""></span><span class="tag">'+esc(t("s_ok"))+'</span><b>'+esc(pname(x))+'</b><small>'+esc(brand(x))+'</small></button>'}).join(""):'<p class="src">'+esc(t("empty"))+'</p>';
   }).catch(function(){ if(id===shelfReq)$("grid").innerHTML='<p class="src">'+esc(t("offline"))+'</p>' });
 }
 
