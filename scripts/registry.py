@@ -1,7 +1,9 @@
 """Nightly registry job.
 1. data/labels_stats.json : which label tags appear on halal-claimed products (to link products to certifiers).
 2. data/snapshot.json + data/changes.json : detect when a tracked product loses its halal claim or changes additives."""
-import json, os, time, hashlib, urllib.parse, urllib.request
+import json, os, sys, time, hashlib, urllib.parse, urllib.request
+sys.path.insert(0, os.path.dirname(__file__))
+from verify import still_has
 from collections import Counter
 
 S = "https://search.openfoodfacts.org/search?"
@@ -32,7 +34,7 @@ for page in range(1, 31):
         for c in CERTS:
             if set(c["tags"]) & set(h.get("labels_tags") or []):
                 c["count"] += 1
-                if len(c["products"]) < 12 and h.get("image_front_small_url") and (h.get("product_name_fr") or h.get("product_name")):
+                if len(c["products"]) < 30 and h.get("image_front_small_url") and (h.get("product_name_fr") or h.get("product_name")):
                     b = h.get("brands")
                     c["products"].append({"code": h["code"], "product_name": h.get("product_name") or "", "product_name_fr": h.get("product_name_fr") or "",
                                           "product_name_en": h.get("product_name_en") or "", "brands": ", ".join(b) if isinstance(b, list) else (b or ""),
@@ -51,6 +53,14 @@ if total == 0:
 json.dump({"updated": TODAY, "products": total, "labels": labels.most_common(400)},
           open("data/labels_stats.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 print("products", total, "distinct labels", len(labels))
+for c in CERTS:
+    ok = []
+    for p in c["products"]:
+        if still_has(p["code"], c["tags"]):
+            ok.append(p)
+        if len(ok) == 12: break
+    print(c["id"], "verified", len(ok), "of", len(c["products"]))
+    c["products"] = ok
 json.dump({"updated": TODAY, "sample": total, "list": sorted(CERTS, key=lambda c: -c["count"])}, open("data/certifiers.json", "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 
 # ---- 2. change detection against yesterday's snapshot

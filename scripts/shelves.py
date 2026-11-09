@@ -1,5 +1,7 @@
 """Rebuild data/shelves.json: products with a halal claim, per aisle, from Open Food Facts (search-a-licious)."""
-import json, urllib.parse, urllib.request, time
+import json, os, sys, urllib.parse, urllib.request, time
+sys.path.insert(0, os.path.dirname(__file__))
+from verify import still_has
 
 SHELVES = {
     "candies": "en:candies", "chocolates": "en:chocolates", "biscuits": "en:biscuits",
@@ -21,6 +23,8 @@ for key, cat in SHELVES.items():
             continue
         b = h.get("brands")
         h["brands"] = ", ".join(b) if isinstance(b, list) else (b or "")
+        if not still_has(h["code"], []):
+            continue
         keep.append(h)
         if len(keep) == 12:
             break
