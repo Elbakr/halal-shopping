@@ -147,6 +147,18 @@ h2.sec{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,5vw,32p
 .chlist{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .chrow{font:inherit;text-align:start;color:var(--ink);background:transparent;border:0;border-top:1px solid var(--line);padding:12px 16px;cursor:pointer;display:flex;gap:12px;align-items:baseline}
 .chrow:first-child{border-top:0}.chrow time{font-family:var(--f-mono);font-size:12px;color:var(--muted);flex:none}
+.help{border-top:1px solid var(--line);padding:16px 22px;display:flex;flex-direction:column;gap:10px;background:var(--go-soft)}
+.helpT{font-family:var(--f-display);font-weight:800;font-size:17px}
+.helpQ{font-size:15px;font-weight:700}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+.hb{font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:11px 16px;border:2px solid var(--ink);background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.hb svg{width:18px;height:18px}
+.hb.yes{border-color:var(--go);color:var(--go)}.hb.no{border-color:var(--stop);color:var(--stop)}
+.hb.on{background:var(--ink);color:var(--paper);border-color:var(--ink);opacity:1}
+.comm{display:flex;gap:6px;flex-wrap:wrap}.comm:empty{display:none}
+.cm{font-size:13px;font-weight:700;border-radius:8px;padding:4px 9px;background:var(--card)}
+.cm.seen{color:var(--go)}.cm.notseen{color:var(--stop)}.cm.changed{color:var(--wait)}
+.mine{align-self:flex-start;font-size:14px;font-weight:700;color:#05211a;background:var(--go-bright);border-radius:999px;padding:5px 12px}
 /* Traps */
 .traps{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
 .trap{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:6px}
@@ -196,6 +208,7 @@ footer .in{padding-block:22px calc(28px + env(safe-area-inset-bottom,0px));displ
       <div class="mini"><label for="photo" data-t="photo"></label><input type="file" id="photo" accept="image/*" capture="environment" hidden><input type="file" id="logoPhoto" accept="image/*" capture="environment" hidden></div>
       <div id="msg" role="status" aria-live="polite"></div>
     </div>
+    <div class="mine" id="mine" hidden></div>
     <div class="trust"><span data-t="t1"></span><span data-t="t2"></span><span data-t="t3"></span></div>
   </div>
 </header>
@@ -311,7 +324,7 @@ function analyse(p){
 
 // ---------- Text ----------
 var T={
-fr:{sendLogo:"Envoyer une photo du logo halal",sent:"Merci, photo reçue. Elle sera vérifiée avant d'enrichir la fiche.",sendFail:"L'envoi n'a pas abouti. Réessayez dans un instant.",cert:"Organisme cité",certT:"Qui certifie quoi",certL:"Les organismes cités sur les emballages, parmi les 3 000 produits halal les plus scannés.",follow:"Suivre ce produit",following:"Suivi",watchT:"Mes produits suivis",changed:"a changé depuis votre dernière visite",lost:"ne porte plus de mention halal",fix:"Compléter la fiche",changesT:"Changements détectés",chAdd:"additifs modifiés",chIng:"liste d'ingrédients modifiée",byname:"La recherche par nom est saturée en ce moment. Tapez les chiffres du code-barres ou scannez.",h1:"Halal ou pas ?<br><em>Scannez.</em> La réponse en 2 secondes.",sub:"Visez le code-barres d'un produit. Vous voyez s'il porte une mention halal, et chaque ingrédient qui pose question.",camera:"Scanner un produit",check:"Vérifier",photo:"ou envoyer une photo du code-barres",placeholder:"Code-barres ou nom du produit",
+fr:{helpT:"Aidez la communauté en un geste",q_logo:"Voyez-vous un logo halal sur l'emballage ?",yes:"Oui, je le vois",no:"Non, aucun logo",changedBtn:"La recette a changé",photoIng:"Photo des ingrédients",photoFront:"Photo du produit",thanks:"Merci ! Votre signalement compte.",c_seen:"Logo halal vu par {n} membres",c_notseen:"Aucun logo vu par {n} membres",c_changed:"Recette signalée changée par {n} membres",mine:"Vos contributions : {n}",unknownT:"Produit inconnu. Ajoutez-le en deux photos, sans quitter la page.",sendLogo:"Envoyer une photo du logo halal",sent:"Merci, photo reçue. Elle sera vérifiée avant d'enrichir la fiche.",sendFail:"L'envoi n'a pas abouti. Réessayez dans un instant.",cert:"Organisme cité",certT:"Qui certifie quoi",certL:"Les organismes cités sur les emballages, parmi les 3 000 produits halal les plus scannés.",follow:"Suivre ce produit",following:"Suivi",watchT:"Mes produits suivis",changed:"a changé depuis votre dernière visite",lost:"ne porte plus de mention halal",fix:"Compléter la fiche",changesT:"Changements détectés",chAdd:"additifs modifiés",chIng:"liste d'ingrédients modifiée",byname:"La recherche par nom est saturée en ce moment. Tapez les chiffres du code-barres ou scannez.",h1:"Halal ou pas ?<br><em>Scannez.</em> La réponse en 2 secondes.",sub:"Visez le code-barres d'un produit. Vous voyez s'il porte une mention halal, et chaque ingrédient qui pose question.",camera:"Scanner un produit",check:"Vérifier",photo:"ou envoyer une photo du code-barres",placeholder:"Code-barres ou nom du produit",
  t1:"Gratuit, sans inscription",t2:"Base mondiale de produits",t3:"Plus de 15 langues",
  loading:"Recherche du produit…",notfound:"Ce produit n'est pas encore dans la base. Ajoutez-le en 1 minute, il servira à tout le monde.",offline:"La base produits ne répond pas. Réessayez dans un instant.",nocam:"Caméra indisponible sur cet appareil. Envoyez une photo du code-barres ou tapez les chiffres.",nobar:"Aucun code-barres lu. Reprenez la photo plus près.",camhint:"Visez le code-barres, la lecture est automatique.",
  s_ok:"Halal déclaré",s_bad:"Pas halal",s_conflict:"Halal déclaré, à contrôler",s_check:"À vérifier",s_none:"Aucune mention halal",s_empty:"Ingrédients inconnus",
@@ -322,7 +335,7 @@ fr:{sendLogo:"Envoyer une photo du logo halal",sent:"Merci, photo reçue. Elle s
  howT:"Comment ça marche",s1:"Scannez",s1p:"Le code-barres suffit. Aucune inscription.",s2:"Lisez le verdict",s2p:"Vert, orange ou rouge, avec la raison écrite en clair.",s3:"Choisissez mieux",s3p:"Des produits du même rayon qui déclarent une mention halal.",
  legal:"halal.shopping ne certifie aucun produit. Nous lisons les mentions déclarées par les marques et les listes d'ingrédients. En cas de doute, l'emballage et l'organisme certificateur font foi.",data:"Données produits : Open Food Facts, licence ODbL.",
  sh:{candies:"Bonbons",chocolates:"Chocolats",biscuits:"Biscuits",sausages:"Charcuterie",meats:"Viandes",cheeses:"Fromages",frozen:"Surgelés",snacks:"Apéritif",beverages:"Boissons"}},
-nl:{sendLogo:"Foto van het halallogo sturen",sent:"Bedankt, foto ontvangen. Ze wordt gecontroleerd voor ze de fiche aanvult.",sendFail:"Verzenden mislukt. Probeer zo opnieuw.",cert:"Vermelde instantie",certT:"Wie certificeert wat",certL:"De instanties op de verpakkingen, bij de 3 000 meest gescande halalproducten.",follow:"Product volgen",following:"Gevolgd",watchT:"Mijn gevolgde producten",changed:"is veranderd sinds je laatste bezoek",lost:"heeft geen halalvermelding meer",fix:"Fiche aanvullen",changesT:"Vastgestelde wijzigingen",chAdd:"additieven gewijzigd",chIng:"ingrediëntenlijst gewijzigd",byname:"Zoeken op naam is nu overbelast. Typ de cijfers van de barcode of scan.",h1:"Halal of niet?<br><em>Scan.</em> Het antwoord in 2 seconden.",sub:"Richt op de barcode van een product. Je ziet of het een halalvermelding heeft, en elk ingrediënt dat vragen oproept.",camera:"Product scannen",check:"Controleren",photo:"of stuur een foto van de barcode",placeholder:"Barcode of productnaam",
+nl:{helpT:"Help de gemeenschap met één tik",q_logo:"Zie je een halallogo op de verpakking?",yes:"Ja, ik zie het",no:"Nee, geen logo",changedBtn:"Het recept is veranderd",photoIng:"Foto van de ingrediënten",photoFront:"Foto van het product",thanks:"Bedankt! Je melding telt mee.",c_seen:"Halallogo gezien door {n} leden",c_notseen:"Geen logo gezien door {n} leden",c_changed:"Recept als gewijzigd gemeld door {n} leden",mine:"Jouw bijdragen: {n}",unknownT:"Onbekend product. Voeg het toe met twee foto's, zonder de pagina te verlaten.",sendLogo:"Foto van het halallogo sturen",sent:"Bedankt, foto ontvangen. Ze wordt gecontroleerd voor ze de fiche aanvult.",sendFail:"Verzenden mislukt. Probeer zo opnieuw.",cert:"Vermelde instantie",certT:"Wie certificeert wat",certL:"De instanties op de verpakkingen, bij de 3 000 meest gescande halalproducten.",follow:"Product volgen",following:"Gevolgd",watchT:"Mijn gevolgde producten",changed:"is veranderd sinds je laatste bezoek",lost:"heeft geen halalvermelding meer",fix:"Fiche aanvullen",changesT:"Vastgestelde wijzigingen",chAdd:"additieven gewijzigd",chIng:"ingrediëntenlijst gewijzigd",byname:"Zoeken op naam is nu overbelast. Typ de cijfers van de barcode of scan.",h1:"Halal of niet?<br><em>Scan.</em> Het antwoord in 2 seconden.",sub:"Richt op de barcode van een product. Je ziet of het een halalvermelding heeft, en elk ingrediënt dat vragen oproept.",camera:"Product scannen",check:"Controleren",photo:"of stuur een foto van de barcode",placeholder:"Barcode of productnaam",
  t1:"Gratis, zonder account",t2:"Wereldwijde productdatabank",t3:"Meer dan 15 talen",
  loading:"Product zoeken…",notfound:"Dit product staat nog niet in de databank. Voeg het in 1 minuut toe, iedereen heeft er baat bij.",offline:"De productdatabank antwoordt niet. Probeer zo opnieuw.",nocam:"Camera niet beschikbaar op dit toestel. Stuur een foto van de barcode of typ de cijfers.",nobar:"Geen barcode gelezen. Neem de foto van dichterbij.",camhint:"Richt op de barcode, het lezen gaat vanzelf.",
  s_ok:"Halal vermeld",s_bad:"Niet halal",s_conflict:"Halal vermeld, te controleren",s_check:"Na te vragen",s_none:"Geen halalvermelding",s_empty:"Ingrediënten onbekend",
@@ -333,7 +346,7 @@ nl:{sendLogo:"Foto van het halallogo sturen",sent:"Bedankt, foto ontvangen. Ze w
  howT:"Zo werkt het",s1:"Scan",s1p:"De barcode volstaat. Geen account.",s2:"Lees het oordeel",s2p:"Groen, oranje of rood, met de reden in gewone taal.",s3:"Kies beter",s3p:"Producten uit dezelfde afdeling met halalvermelding.",
  legal:"halal.shopping certificeert geen enkel product. We lezen de vermeldingen van de merken en de ingrediëntenlijsten. Bij twijfel gelden de verpakking en de certificerende instantie.",data:"Productgegevens: Open Food Facts, ODbL-licentie.",
  sh:{candies:"Snoep",chocolates:"Chocolade",biscuits:"Koekjes",sausages:"Vleeswaren",meats:"Vlees",cheeses:"Kaas",frozen:"Diepvries",snacks:"Aperitief",beverages:"Dranken"}},
-en:{sendLogo:"Send a photo of the halal logo",sent:"Thanks, photo received. It will be checked before it enriches the record.",sendFail:"Sending failed. Try again in a moment.",cert:"Certifier named",certT:"Who certifies what",certL:"Certifiers named on packs, among the 3,000 most scanned halal products.",follow:"Follow this product",following:"Following",watchT:"My followed products",changed:"has changed since your last visit",lost:"no longer carries a halal claim",fix:"Complete this record",changesT:"Changes detected",chAdd:"additives changed",chIng:"ingredient list changed",byname:"Search by name is overloaded right now. Type the barcode digits or scan.",h1:"Halal or not?<br><em>Scan.</em> The answer in 2 seconds.",sub:"Point at a product's barcode. See whether it carries a halal claim, and every ingredient that raises a question.",camera:"Scan a product",check:"Check",photo:"or send a photo of the barcode",placeholder:"Barcode or product name",
+en:{helpT:"Help the community in one tap",q_logo:"Do you see a halal logo on the pack?",yes:"Yes, I see it",no:"No logo",changedBtn:"The recipe changed",photoIng:"Photo of the ingredients",photoFront:"Photo of the product",thanks:"Thanks! Your report counts.",c_seen:"Halal logo seen by {n} members",c_notseen:"No logo seen by {n} members",c_changed:"Recipe reported changed by {n} members",mine:"Your contributions: {n}",unknownT:"Unknown product. Add it with two photos, without leaving the page.",sendLogo:"Send a photo of the halal logo",sent:"Thanks, photo received. It will be checked before it enriches the record.",sendFail:"Sending failed. Try again in a moment.",cert:"Certifier named",certT:"Who certifies what",certL:"Certifiers named on packs, among the 3,000 most scanned halal products.",follow:"Follow this product",following:"Following",watchT:"My followed products",changed:"has changed since your last visit",lost:"no longer carries a halal claim",fix:"Complete this record",changesT:"Changes detected",chAdd:"additives changed",chIng:"ingredient list changed",byname:"Search by name is overloaded right now. Type the barcode digits or scan.",h1:"Halal or not?<br><em>Scan.</em> The answer in 2 seconds.",sub:"Point at a product's barcode. See whether it carries a halal claim, and every ingredient that raises a question.",camera:"Scan a product",check:"Check",photo:"or send a photo of the barcode",placeholder:"Barcode or product name",
  t1:"Free, no sign-up",t2:"Worldwide product database",t3:"Over 15 languages",
  loading:"Looking up the product…",notfound:"This product is not in the database yet. Add it in 1 minute, it helps everyone.",offline:"The product database is not answering. Try again in a moment.",nocam:"Camera unavailable on this device. Send a photo of the barcode or type the digits.",nobar:"No barcode read. Take the photo closer.",camhint:"Point at the barcode, it reads automatically.",
  s_ok:"Halal claimed",s_bad:"Not halal",s_conflict:"Halal claimed, check it",s_check:"Needs checking",s_none:"No halal claim",s_empty:"Ingredients unknown",
@@ -344,7 +357,7 @@ en:{sendLogo:"Send a photo of the halal logo",sent:"Thanks, photo received. It w
  howT:"How it works",s1:"Scan",s1p:"The barcode is enough. No sign-up.",s2:"Read the verdict",s2p:"Green, amber or red, with the reason in plain words.",s3:"Choose better",s3p:"Products from the same aisle that carry a halal claim.",
  legal:"halal.shopping certifies no product. We read the claims made by brands and the ingredient lists. When in doubt, the pack and the certifying body prevail.",data:"Product data: Open Food Facts, ODbL licence.",
  sh:{candies:"Sweets",chocolates:"Chocolate",biscuits:"Biscuits",sausages:"Cold cuts",meats:"Meat",cheeses:"Cheese",frozen:"Frozen",snacks:"Snacks",beverages:"Drinks"}},
-ar:{sendLogo:"أرسل صورة لشعار الحلال",sent:"شكراً، وصلت الصورة. ستُراجع قبل إضافتها إلى البطاقة.",sendFail:"تعذّر الإرسال. حاول بعد قليل.",cert:"الهيئة المذكورة",certT:"من يمنح الشهادة",certL:"الهيئات المذكورة على العبوات، ضمن أكثر 3000 منتج حلال مسحاً.",follow:"تابع هذا المنتج",following:"متابَع",watchT:"منتجاتي المتابَعة",changed:"تغيّر منذ زيارتك الأخيرة",lost:"لم يعد يحمل إشارة حلال",fix:"أكمل البطاقة",changesT:"تغييرات مرصودة",chAdd:"تغيّرت الإضافات",chIng:"تغيّرت قائمة المكونات",byname:"البحث بالاسم مزدحم حالياً. اكتب أرقام الرمز الشريطي أو امسح.",h1:"حلال أم لا؟<br><em>امسح.</em> الجواب في ثانيتين.",sub:"وجّه الكاميرا نحو الرمز الشريطي. سترى إن كان المنتج يحمل إشارة حلال، وكل مكوّن يثير سؤالاً.",camera:"امسح منتجاً",check:"تحقق",photo:"أو أرسل صورة للرمز الشريطي",placeholder:"الرمز الشريطي أو اسم المنتج",
+ar:{helpT:"ساعد المجتمع بلمسة واحدة",q_logo:"هل ترى شعار حلال على العبوة؟",yes:"نعم، أراه",no:"لا، لا يوجد شعار",changedBtn:"تغيّرت المكونات",photoIng:"صورة المكونات",photoFront:"صورة المنتج",thanks:"شكراً! بلاغك محسوب.",c_seen:"شعار الحلال رآه {n} عضواً",c_notseen:"لم يرَ الشعار {n} عضواً",c_changed:"أبلغ {n} عضواً عن تغيّر المكونات",mine:"مساهماتك: {n}",unknownT:"منتج غير معروف. أضفه بصورتين دون مغادرة الصفحة.",sendLogo:"أرسل صورة لشعار الحلال",sent:"شكراً، وصلت الصورة. ستُراجع قبل إضافتها إلى البطاقة.",sendFail:"تعذّر الإرسال. حاول بعد قليل.",cert:"الهيئة المذكورة",certT:"من يمنح الشهادة",certL:"الهيئات المذكورة على العبوات، ضمن أكثر 3000 منتج حلال مسحاً.",follow:"تابع هذا المنتج",following:"متابَع",watchT:"منتجاتي المتابَعة",changed:"تغيّر منذ زيارتك الأخيرة",lost:"لم يعد يحمل إشارة حلال",fix:"أكمل البطاقة",changesT:"تغييرات مرصودة",chAdd:"تغيّرت الإضافات",chIng:"تغيّرت قائمة المكونات",byname:"البحث بالاسم مزدحم حالياً. اكتب أرقام الرمز الشريطي أو امسح.",h1:"حلال أم لا؟<br><em>امسح.</em> الجواب في ثانيتين.",sub:"وجّه الكاميرا نحو الرمز الشريطي. سترى إن كان المنتج يحمل إشارة حلال، وكل مكوّن يثير سؤالاً.",camera:"امسح منتجاً",check:"تحقق",photo:"أو أرسل صورة للرمز الشريطي",placeholder:"الرمز الشريطي أو اسم المنتج",
  t1:"مجاني وبدون تسجيل",t2:"قاعدة منتجات عالمية",t3:"أكثر من 15 لغة",
  loading:"جارٍ البحث عن المنتج…",notfound:"هذا المنتج غير موجود بعد في القاعدة. أضفه في دقيقة ليستفيد الجميع.",offline:"قاعدة المنتجات لا تستجيب. حاول بعد قليل.",nocam:"الكاميرا غير متاحة على هذا الجهاز. أرسل صورة للرمز أو اكتب الأرقام.",nobar:"لم يُقرأ أي رمز. التقط الصورة عن قرب.",camhint:"وجّه الكاميرا نحو الرمز، القراءة تلقائية.",
  s_ok:"حلال حسب الشركة",s_bad:"غير حلال",s_conflict:"حلال معلن، يحتاج تحققاً",s_check:"يحتاج تحققاً",s_none:"لا إشارة حلال",s_empty:"المكونات غير معروفة",
@@ -381,7 +394,7 @@ function paint(l){
   document.querySelectorAll("[data-t]").forEach(function(el){el.textContent=t(el.dataset.t)});
   document.querySelectorAll("[data-th]").forEach(function(el){el.innerHTML=t(el.dataset.th)});
   $("q").placeholder=t("placeholder"); $("lang").value=L;
-  renderShelves(); renderTraps(); renderGuide(); renderCerts(); renderWatch(); renderChanges(); if(SHELFDATA)loadShelf(shelf); if(last)render(last.p,last.r);
+  renderShelves(); renderTraps(); renderGuide(); renderCerts(); renderWatch(); renderChanges(); renderMine(); if(SHELFDATA)loadShelf(shelf); if(last)render(last.p,last.r);
   document.querySelectorAll(".alert").forEach(function(b){b.textContent=b.dataset.n+" "+t(b.dataset.m)});
 }
 function renderShelves(){
@@ -410,8 +423,8 @@ function lookup(q,push){
                  .catch(function(){return getJSON(SEARCH+"?q="+encodeURIComponent(q)+"&page_size=1&fields=code").then(function(j){var c=j&&j.hits&&j.hits[0]&&j.hits[0].code;return c?getJSON(API+"/api/v2/product/"+c+"?fields="+FIELDS).then(function(k){return k&&k.status===1?k.product:null}):null})});
   req.then(function(p){
     msg(""); var out=$("out"); out.hidden=false;
-    if(!p){last=null;out.innerHTML='<div class="note">'+esc(t("notfound"))+' <a href="https://world.openfoodfacts.org/cgi/product.pl'+(isCode?"?code="+q+"&type=add":"")+'" target="_blank" rel="noopener"><b>'+esc(t("add"))+'</b></a></div>';out.scrollIntoView({behavior:"smooth"});return}
-    var r=analyse(p); last={p:p,r:r}; render(p,r);
+    if(!p){last=null;curCode=isCode?q:null;out.innerHTML=(HSAPI_OK&&isCode)?'<div class="note"><b>'+esc(t("unknownT"))+'</b><div class="hbtns" style="margin-top:10px"><button type="button" class="hb" data-photo="front">'+CAM+esc(t("photoFront"))+'</button><button type="button" class="hb" data-photo="ingredients">'+CAM+esc(t("photoIng"))+'</button></div></div>':'<div class="note">'+esc(t("notfound"))+'</div>';out.scrollIntoView({behavior:"smooth"});return}
+    var r=analyse(p); last={p:p,r:r}; curCode=p.code; render(p,r);
     if(p.code&&push!==false){try{history.replaceState(null,"","#p"+p.code)}catch(e){}}
     out.scrollIntoView({behavior:"smooth"});
   }).catch(function(){msg(isCode?t("offline"):t("byname"))});
@@ -431,9 +444,10 @@ function render(p,r){
   $("out").innerHTML='<article class="answer"><div class="banner '+key+'"><span class="sig"><svg viewBox="0 0 24 24">'+ICON[key]+'</svg></span><div class="btxt"><strong>'+esc(t("s_"+r.status))+'</strong><span>'+esc(t("e_"+r.status))+'</span></div></div>'+
    '<div class="prod">'+(img?'<img src="'+esc(img)+'" alt="">':"")+'<div style="min-width:0"><h2>'+esc(pname(p))+'</h2><div class="meta">'+esc(brand(p)+(p.code?" · "+p.code:""))+'</div></div></div>'+
    (flags?'<div class="flags">'+flags+'</div>':"")+
-   '<div class="acts"><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn solid" id="share">'+esc(t("share"))+'</button><button type="button" class="btn" id="follow">'+esc(watched(p.code)?t("following"):t("follow"))+'</button><a class="btn" href="https://world.openfoodfacts.org/cgi/product.pl?type=edit&code='+esc(p.code)+'" target="_blank" rel="noopener">'+esc(t("fix"))+'</a>'+(HSAPI_OK?'<label class="btn" for="logoPhoto">'+esc(t("sendLogo"))+'</label>':"")+'</span><a class="src" href="https://world.openfoodfacts.org/product/'+esc(p.code)+'" target="_blank" rel="noopener">'+esc(t("source"))+' · Open Food Facts</a></div></article>';
+   helpHTML(p.code)+
+   '<div class="acts"><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn solid" id="share">'+esc(t("share"))+'</button><button type="button" class="btn" id="follow">'+esc(watched(p.code)?t("following"):t("follow"))+'</button></span><a class="src" href="https://world.openfoodfacts.org/product/'+esc(p.code)+'" target="_blank" rel="noopener">'+esc(t("source"))+' · Open Food Facts</a></div></article>';
   $("follow").onclick=function(){var w=getWatch();if(w[p.code])delete w[p.code];else w[p.code]=sigOf(p,r);setWatch(w);this.textContent=w[p.code]?t("following"):t("follow");renderWatch()};
-  $("share").dataset.code=p.code;
+  loadCounts(p.code);
   $("share").onclick=function(){
     var url="https://halal.shopping/#p"+p.code, title=pname(p)+" — "+t("s_"+r.status);
     if(navigator.share){navigator.share({title:title,url:url}).catch(function(){})}
@@ -442,11 +456,36 @@ function render(p,r){
 }
 
 var HSAPI="https://api.halal.shopping", HSAPI_OK=false;
+var curCode=null, pendingKind="logo";
+var CAM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+function device(){var d=store("hs_dev");if(!d){d="";for(var i=0;i<16;i++)d+="abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random()*36)];store("hs_dev",d)}return d}
+function getDone(){try{return JSON.parse(store("hs_done")||"{}")||{}}catch(e){return {}}}
+function markDone(k){var d=getDone();if(d[k])return;d[k]=1;store("hs_done",JSON.stringify(d));renderMine()}
+function renderMine(){var n=Object.keys(getDone()).length,el=$("mine");el.hidden=!n;el.textContent=t("mine").replace("{n}",n)}
+function helpHTML(code){
+  if(!HSAPI_OK||!code)return ""; var d=getDone();
+  function b(kind,label,cls){var on=d[code+":"+kind];return '<button type="button" class="hb '+cls+(on?" on":"")+'" data-sig="'+kind+'"'+(on?" disabled":"")+'>'+esc(label)+'</button>'}
+  function ph(kind,label){var on=d[code+":p:"+kind];return '<button type="button" class="hb'+(on?" on":"")+'" data-photo="'+kind+'">'+CAM+esc(label)+'</button>'}
+  return '<div class="help"><div class="helpT">'+esc(t("helpT"))+'</div><div id="comm" class="comm"></div><div class="helpQ">'+esc(t("q_logo"))+'</div><div class="hbtns">'+b("seen",t("yes"),"yes")+b("notseen",t("no"),"no")+b("changed",t("changedBtn"),"")+'</div><div class="hbtns">'+ph("logo",t("sendLogo"))+ph("ingredients",t("photoIng"))+'</div></div>';
+}
+function loadCounts(code){
+  if(!HSAPI_OK||!code)return;
+  fetch(HSAPI+"/api/collections/signal_counts/records?perPage=10&filter="+encodeURIComponent("code='"+code+"'")).then(function(r){return r.ok?r.json():null}).then(function(j){
+    var el=$("comm"); if(!el||!j||curCode!==code)return; var m={}; (j.items||[]).forEach(function(x){m[x.kind]=x.n});
+    el.innerHTML=["seen","notseen","changed"].filter(function(k){return m[k]}).map(function(k){return '<span class="cm '+k+'">'+esc(t("c_"+k).replace("{n}",m[k]))+'</span>'}).join("");
+  }).catch(function(){});
+}
+function sendSignal(kind,btn){
+  var code=curCode; if(!code)return; btn.disabled=true; btn.classList.add("on");
+  fetch(HSAPI+"/api/collections/signals/records",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:code,kind:kind,device:device(),lang:L})})
+   .then(function(r){ if(r.ok||r.status===400){markDone(code+":"+kind);toast(t("thanks"));loadCounts(code)} else {btn.disabled=false;btn.classList.remove("on");toast(t("sendFail"))} })
+   .catch(function(){btn.disabled=false;btn.classList.remove("on");toast(t("sendFail"))});
+}
 function shrink(file){return createImageBitmap(file).then(function(b){var m=1600,k=Math.min(1,m/Math.max(b.width,b.height)),c=document.createElement("canvas");c.width=Math.round(b.width*k);c.height=Math.round(b.height*k);c.getContext("2d").drawImage(b,0,0,c.width,c.height);return new Promise(function(ok){c.toBlob(ok,"image/jpeg",0.85)})})}
 function sendPhoto(file){
-  if(!last||!last.p||!last.p.code)return; var code=last.p.code;
-  shrink(file).then(function(blob){var f=new FormData();f.append("code",code);f.append("kind","logo");f.append("lang",L);f.append("photo",blob,code+".jpg");
-    return fetch(HSAPI+"/api/collections/contributions/records",{method:"POST",body:f})}).then(function(r){toast(r.ok?t("sent"):t("sendFail"))}).catch(function(){toast(t("sendFail"))});
+  var code=curCode, kind=pendingKind; if(!code)return;
+  shrink(file).then(function(blob){var f=new FormData();f.append("code",code);f.append("kind",kind);f.append("lang",L);f.append("photo",blob,code+".jpg");
+    return fetch(HSAPI+"/api/collections/contributions/records",{method:"POST",body:f})}).then(function(r){ if(r.ok){markDone(code+":p:"+kind);toast(t("sent"));var b=document.querySelector('[data-photo="'+kind+'"]');if(b)b.classList.add("on")} else toast(t("sendFail")) }).catch(function(){toast(t("sendFail"))});
 }
 var CERTS=null, certSel=null;
 function region(cc){try{return new Intl.DisplayNames([L],{type:"region"}).of(cc)||cc}catch(e){return cc}}
@@ -514,6 +553,8 @@ $("f").addEventListener("submit",function(e){e.preventDefault();lookup($("q").va
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-code]"); if(b){lookup(b.dataset.code);return}
   var s=e.target.closest("[data-shelf]"); if(s){loadShelf(s.dataset.shelf);return}
+  var sg=e.target.closest("[data-sig]"); if(sg){sendSignal(sg.dataset.sig,sg);return}
+  var pb=e.target.closest("[data-photo]"); if(pb){pendingKind=pb.dataset.photo;$("logoPhoto").click();return}
   var ce=e.target.closest("[data-cert]"); if(ce){certSel=certSel===ce.dataset.cert?null:ce.dataset.cert;renderCerts();return}
 });
 function fromHash(){var m=location.hash.match(/^#p(\d{8,14})$/); if(m)lookup(m[1],false)}
