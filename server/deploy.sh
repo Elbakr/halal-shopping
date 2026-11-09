@@ -20,6 +20,7 @@ fi
   echo "pocketbase: $(systemctl is-active pocketbase) v$(cat /opt/hs/pb/VERSION 2>/dev/null)"
   echo "caddy: $(systemctl is-active caddy)"
   echo "health: $(curl -s -m 5 http://127.0.0.1:8090/api/health | head -c 200)"
+  echo "timer: $(systemctl is-active hs-deploy.timer)"
   echo "disk: $(df -h / | tail -1 | awk '{print $3" / "$2}')"
   echo "contributions: $(ls /opt/hs/pb/pb_data/storage 2>/dev/null | wc -l) storage dirs"
   echo "--- pocketbase log (errors only)"

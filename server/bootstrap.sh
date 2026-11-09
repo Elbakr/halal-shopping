@@ -66,5 +66,23 @@ fi
 systemctl daemon-reload
 systemctl enable --now pocketbase
 systemctl restart caddy
-echo '*/5 * * * * root /opt/hs/deploy.sh' > /etc/cron.d/hs-deploy
+cat > /etc/systemd/system/hs-deploy.service <<'UNIT'
+[Unit]
+Description=halal.shopping: apply server/ from the repository and write the status page
+[Service]
+Type=oneshot
+ExecStart=/opt/hs/deploy.sh
+UNIT
+cat > /etc/systemd/system/hs-deploy.timer <<'UNIT'
+[Unit]
+Description=Run hs-deploy every 3 minutes
+[Timer]
+OnCalendar=*:0/3
+OnBootSec=90
+AccuracySec=10
+[Install]
+WantedBy=timers.target
+UNIT
+systemctl daemon-reload
+systemctl enable --now hs-deploy.timer
 /opt/hs/deploy.sh
