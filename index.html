@@ -698,7 +698,7 @@ function sendPlace(id,kind,btn){
 }
 function nearMe(){
   if(!navigator.geolocation){pmsg(t("geoFail"));return} pmsg("…");
-  navigator.geolocation.getCurrentPosition(function(p){loadPlaces(p.coords.latitude,p.coords.longitude)},function(){pmsg(t("geoFail"));$("city").focus()},{timeout:10000,maximumAge:300000});
+  navigator.geolocation.getCurrentPosition(function(p){$("city").value="";loadPlaces(p.coords.latitude,p.coords.longitude)},function(){pmsg(t("geoFail"));$("city").focus()},{timeout:10000,maximumAge:300000});
 }
 function findCity(q){
   q=String(q||"").trim(); if(!q)return; pmsg("…");
