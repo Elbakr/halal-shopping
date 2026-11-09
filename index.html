@@ -585,10 +585,10 @@ function drawMap(){
   if(!PLACES.length){$("pmap").hidden=true;return}
   loadLeaflet().then(function(){
     $("pmap").hidden=false;
-    if(!pmap){pmap=L.map("pmap",{scrollWheelZoom:false});L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(pmap)}
-    if(player)player.remove(); player=L.layerGroup().addTo(pmap);
-    PLACES.forEach(function(p){L.circleMarker([p.lat,p.lon],{radius:8,color:"#0a7550",fillColor:"#34d399",fillOpacity:.9,weight:2}).bindPopup("<b>"+esc(p.name)+"</b>").addTo(player)});
-    L.circleMarker(pcenter,{radius:6,color:"#0f211b",fillColor:"#0f211b",fillOpacity:1}).addTo(player);
+    if(!pmap){pmap=window.L.map("pmap",{scrollWheelZoom:false});window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(pmap)}
+    if(player)player.remove(); player=window.L.layerGroup().addTo(pmap);
+    PLACES.forEach(function(p){window.L.circleMarker([p.lat,p.lon],{radius:8,color:"#0a7550",fillColor:"#34d399",fillOpacity:.9,weight:2}).bindPopup("<b>"+esc(p.name)+"</b>").addTo(player)});
+    window.L.circleMarker(pcenter,{radius:6,color:"#0f211b",fillColor:"#0f211b",fillOpacity:1}).addTo(player);
     pmap.fitBounds(PLACES.slice(0,15).map(function(p){return [p.lat,p.lon]}).concat([pcenter]),{padding:[24,24],maxZoom:16}); setTimeout(function(){pmap.invalidateSize()},200);
   }).catch(function(){});
 }
