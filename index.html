@@ -249,9 +249,10 @@ function analyse(p){
   var halal=labels.some(function(l){return /halal|hallal|helal/.test(l)});
   var certTag=labels.filter(function(l){return /halal|hallal|helal/.test(l)})[0]||"";
   var flags=[], seen={};
+  var txt0=(p.ingredients_text||"")+" "+(p.ingredients_text_fr||"")+" "+(p.ingredients_text_en||"");
   (p.additives_tags||[]).forEach(function(t){
     var m=String(t).toLowerCase().replace(/^[a-z]{2}:/,"").match(/^(e\d{3})/); var k=m?m[1]:"";
-    if(ADD[k]&&!seen[k]){seen[k]=1;flags.push({code:k.toUpperCase(),lvl:ADD[k].lvl,key:k,type:"add"})}
+    if(ADD[k]&&!seen[k]){seen[k]=1;flags.push({code:k.toUpperCase(),lvl:(k==="e441"&&SAFE_GEL.test(txt0))?"ok":ADD[k].lvl,key:k,type:"add"})}
   });
   var txt=(p.ingredients_text||"")+" "+(p.ingredients_text_fr||"")+" "+(p.ingredients_text_en||"");
   WORDS.forEach(function(w){
