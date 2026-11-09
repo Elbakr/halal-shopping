@@ -21,7 +21,10 @@ QUERIES = [
     ("butchers", sparql('?s osmkey:shop "butcher" .')),
 ]
 
-# Every butcher is listed: the ones not tagged halal are shown as "to confirm" and sorted out by members.
+# A venue is listed only on a positive sign: an OpenStreetMap halal tag, "halal" in its own name,
+# a cuisine that is halal in the vast majority of venues, or (butchers) a name that points to a Muslim clientele.
+# A butcher with no such sign is never listed: members add it themselves if it is halal.
+HINT = re.compile(r"islam|musulman|muslim|moslim|kasap|kasab|baraka|bismillah|zam ?zam|m[eé]dina|mecca|mekka|mecque|marrakech|casablanca|maghreb|istanbul|anatol|anadolu|sultan|orient|arabe|arabic|turk|maroc|marok|pakistan|afghan|مجزرة|ملحمة|جزار", re.I)
 SAYS_HALAL = re.compile(r"halal|helal|حلال|ハラール|清真|халяль|हलाल|হালাল", re.I)
 NOT_HALAL = re.compile(r"porc|pork|cochon|charcut|schwein|varken|cerdo|jam[oó]n|maiale|salumer|chevalin|paard|pferd|horse", re.I)
 
@@ -80,15 +83,16 @@ def compact(e):
     if not dec and (g.get("diet:halal") == "no" or g.get("halal") == "no"): return None  # explicitly not halal
     likely = any(c.strip() in LIKELY for c in (g.get("cuisine") or "").split(";"))
     if not dec and not likely:
-        if g.get("shop") != "butcher": return None
+        if g.get("shop") != "butcher" or not HINT.search(name): return None
         if g.get("butcher") in ("pork", "horse") or NOT_HALAL.search(name): return None
+        likely = True
     p = {"i": e["type"][0] + str(e["id"]), "n": name[:80], "la": round(la, 5), "lo": round(lo, 5), "t": kind(g)}
     a = " ".join(x for x in (g.get("addr:street"), g.get("addr:housenumber")) if x)
     if a: p["a"] = a[:80]
     if g.get("addr:city"): p["c"] = g["addr:city"][:40]
     k = (g.get("cuisine") or "").split(";")[0].replace("_", " ").strip()
     if k: p["k"] = k[:30]
-    if not dec: p["p"] = 1 if likely else 2  # 1: cuisine usually halal, 2: unverified butcher; both to be confirmed by members
+    if not dec: p["p"] = 1  # likely, to be confirmed by members
     return p
 
 def main():
@@ -105,19 +109,6 @@ def main():
     print(len(places), "named places,", sum(1 for p in places if "p" not in p), "declared", flush=True)
     if len(places) < 1000:
         print("Too few results: keeping the previous files untouched."); sys.exit(0 if os.path.isdir(OUT) else 1)
-    # An unverified butcher surrounded by halal venues is worth asking members about first ("q").
-    grid = {}
-    for x in places:
-        if x.get("p") != 2: grid.setdefault((round(x["la"] / 0.003), round(x["lo"] / 0.003)), []).append(x)
-    for x in places:
-        if x.get("p") != 2: continue
-        a, o, n = round(x["la"] / 0.003), round(x["lo"] / 0.003), 0
-        for da in (-1, 0, 1):
-            for do in (-1, 0, 1):
-                for y in grid.get((a + da, o + do), ()):
-                    if abs(y["la"] - x["la"]) < 0.0027 and abs(y["lo"] - x["lo"]) * math.cos(math.radians(x["la"])) < 0.0027: n += 1
-        if n >= 5: x["q"] = 1
-    print(sum(1 for x in places if x.get("q")), "butchers in halal-dense streets", flush=True)
     tiles = {}
     for p in places:
         tiles.setdefault(f"{math.floor(p['la'])}_{math.floor(p['lo'])}", []).append(p)
