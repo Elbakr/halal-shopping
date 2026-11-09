@@ -78,3 +78,23 @@ X4 = {
 "bn":["হালাল দোকান ও রেস্তোরাঁ","আপনার আশেপাশে হালাল ঘোষিত জায়গা। এক ট্যাপে নিশ্চিত বা সংশোধন করুন।","আমার আশেপাশে","শহর বা ঠিকানা","খুঁজুন","এখানে এখনও হালাল ঘোষিত কোনো জায়গা পাওয়া যায়নি।","OpenStreetMap-এ হালাল ঘোষিত জায়গা। আমরা কোনো সনদ দিই না।","পথনির্দেশ","আমি নিশ্চিত করছি","আর হালাল নয়","বন্ধ","অবস্থান পাওয়া যায়নি। শহরের নাম লিখুন।","রেস্তোরাঁ","ফাস্ট ফুড","মাংসের দোকান","দোকান"],
 "ur":["حلال دکانیں اور ریستوران","آپ کے آس پاس حلال قرار دی گئی جگہیں۔ ایک ٹیپ سے تصدیق یا درستی کریں۔","میرے آس پاس","شہر یا پتا","تلاش","یہاں ابھی کوئی حلال قرار دی گئی جگہ نہیں ملی۔","OpenStreetMap پر حلال قرار دی گئی جگہیں۔ ہم کوئی تصدیق نہیں دیتے۔","راستہ","میں تصدیق کرتا ہوں","اب حلال نہیں","بند","مقام دستیاب نہیں۔ شہر لکھیں۔","ریستوران","فاسٹ فوڈ","قصاب","دکان"],
 }
+
+KEYS5 = ["undone","undoHint"]
+X5 = {
+"fr":["Signalement annulé.","Une erreur ? Touchez à nouveau votre réponse pour l'annuler."],
+"nl":["Melding ingetrokken.","Vergist? Tik opnieuw op je antwoord om het in te trekken."],
+"en":["Report withdrawn.","A mistake? Tap your answer again to withdraw it."],
+"ar":["تم إلغاء البلاغ.","خطأ؟ المس إجابتك مرة أخرى لإلغائها."],
+"es":["Aviso anulado.","¿Un error? Toque de nuevo su respuesta para anularla."],
+"pt":["Sinalização anulada.","Um engano? Toque de novo na sua resposta para anulá-la."],
+"de":["Meldung zurückgezogen.","Ein Versehen? Tippen Sie erneut auf Ihre Antwort, um sie zurückzuziehen."],
+"tr":["Bildirim geri alındı.","Yanlışlık mı oldu? Geri almak için yanıtınıza tekrar dokunun."],
+"id":["Laporan dibatalkan.","Keliru? Ketuk lagi jawaban Anda untuk membatalkannya."],
+"ms":["Laporan dibatalkan.","Tersilap? Ketik semula jawapan anda untuk membatalkannya."],
+"ru":["Сообщение отменено.","Ошиблись? Нажмите на свой ответ ещё раз, чтобы отменить."],
+"zh":["已撤销反馈。","点错了？再点一次您的回答即可撤销。"],
+"ja":["報告を取り消しました。","間違えましたか？もう一度タップすると取り消せます。"],
+"hi":["सूचना रद्द कर दी गई।","ग़लती हुई? रद्द करने के लिए अपने जवाब पर दोबारा टैप करें।"],
+"bn":["রিপোর্ট বাতিল হয়েছে।","ভুল হয়েছে? বাতিল করতে আপনার উত্তরে আবার ট্যাপ করুন।"],
+"ur":["اطلاع منسوخ کر دی گئی۔","غلطی ہوئی؟ منسوخ کرنے کے لیے اپنے جواب پر دوبارہ ٹیپ کریں۔"],
+}
