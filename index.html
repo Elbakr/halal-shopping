@@ -384,15 +384,15 @@ function render(p,r){
   };
 }
 
-var shelfReq=0;
+var SHELFDATA=null;
+function shelfData(){ if(SHELFDATA)return Promise.resolve(SHELFDATA); return getJSON("data/shelves.json?d="+new Date().toISOString().slice(0,10)).then(function(j){SHELFDATA=j;return j}) }
 function loadShelf(k){
-  shelf=k; renderShelves(); var id=++shelfReq; var cat=SHELVES.filter(function(s){return s[0]===k})[0][1];
-  $("grid").innerHTML=new Array(8).join('<div class="skel"></div>');
-  getJSON(SEARCH+"?q="+encodeURIComponent('categories_tags:"'+cat+'" AND labels_tags:"en:halal"')+"&page_size=24&sort_by=-unique_scans_n&fields=code,product_name,product_name_fr,product_name_nl,product_name_en,brands,image_front_small_url").then(function(j){
-    if(id!==shelfReq)return;
-    var list=(j.hits||[]).filter(function(x){return x.image_front_small_url&&(x.product_name||x.product_name_fr||x.product_name_en)}).slice(0,12);
+  shelf=k; renderShelves();
+  if(!SHELFDATA)$("grid").innerHTML=new Array(9).join('<div class="skel"></div>');
+  shelfData().then(function(j){
+    var list=(j.shelves&&j.shelves[k])||[];
     $("grid").innerHTML=list.length?list.map(function(x){return '<button type="button" class="tile" data-code="'+esc(x.code)+'"><span class="ph"><img loading="lazy" src="'+esc(x.image_front_small_url)+'" alt=""></span><span class="tag">'+esc(t("s_ok"))+'</span><b>'+esc(pname(x))+'</b><small>'+esc(brand(x))+'</small></button>'}).join(""):'<p class="src">'+esc(t("empty"))+'</p>';
-  }).catch(function(){ if(id===shelfReq)$("grid").innerHTML='<p class="src">'+esc(t("offline"))+'</p>' });
+  }).catch(function(){ $("grid").innerHTML='<p class="src">'+esc(t("empty"))+'</p>' });
 }
 
 // ---------- Camera / photo ----------
