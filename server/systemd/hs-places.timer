@@ -1,0 +1,9 @@
+[Unit]
+Description=Run halal.shopping places generation every night
+
+[Timer]
+OnCalendar=*-*-* 02:43:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target

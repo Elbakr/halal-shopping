@@ -1,0 +1,25 @@
+api.halal.shopping {
+	encode gzip
+	request_body {
+		max_size 8MB
+	}
+	handle /_status.txt {
+		root * /var/www/status
+		file_server
+	}
+	# Places regenerated every night on this machine (see server/gen.sh), read by https://halal.shopping
+	handle /data/* {
+		root * /var/www
+		header Access-Control-Allow-Origin "*"
+		header Cache-Control "public, max-age=1800"
+		file_server
+	}
+	handle /sitemap*.xml {
+		root * /var/www/data
+		header Cache-Control "public, max-age=86400"
+		file_server
+	}
+	handle {
+		reverse_proxy 127.0.0.1:8090
+	}
+}

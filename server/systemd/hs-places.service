@@ -1,0 +1,9 @@
+[Unit]
+Description=halal.shopping nightly places generation
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/hs/gen.sh
+Nice=10
+MemoryMax=1400M
