@@ -88,3 +88,26 @@ X14 = {
 }
 for _c, _v in X14.items():
     assert len(_v) == len(KEYS14), (_c, len(_v), len(KEYS14))
+
+# Venues with an up-to-date certificate: badge, filter, "certified near you", transparent rule, renewal flags.
+KEYS15 = ["cert_ok","f_cert","cert_near","cert_rule","org_soon","org_renew"]
+X15 = {
+"fr":["Certificat à jour","Certifiés","Certifiés près de vous","À distance égale, les commerces dont la certification est à jour passent en premier. Aucune place ne s'achète.","expire bientôt : pensez à renouveler","expiré : publiez le nouveau certificat"],
+"nl":["Certificaat geldig","Gecertificeerd","Gecertificeerd bij u in de buurt","Op gelijke afstand komen zaken met een geldig certificaat eerst. Geen enkele plaats is te koop.","verloopt binnenkort: denk aan vernieuwen","verlopen: publiceer het nieuwe certificaat"],
+"en":["Certificate up to date","Certified","Certified near you","At equal distance, places with an up-to-date certification come first. No position can be bought.","expires soon: remember to renew","expired: publish the new certificate"],
+"ar":["شهادة سارية","معتمدة","معتمدة بالقرب منك","عند تساوي المسافة، تظهر المحلات ذات الشهادة السارية أولاً. لا يمكن شراء أي ترتيب.","تنتهي قريباً: لا تنسوا التجديد","منتهية: انشروا الشهادة الجديدة"],
+"es":["Certificado vigente","Certificados","Certificados cerca de usted","A igual distancia, los comercios con certificación vigente aparecen primero. Ningún puesto se compra.","caduca pronto: recuerde renovarlo","caducado: publique el nuevo certificado"],
+"pt":["Certificado em dia","Certificados","Certificados perto de si","À mesma distância, os estabelecimentos com certificação em dia aparecem primeiro. Nenhuma posição se compra.","expira em breve: lembre-se de renovar","expirado: publique o novo certificado"],
+"de":["Zertifikat gültig","Zertifiziert","Zertifiziert in Ihrer Nähe","Bei gleicher Entfernung stehen Betriebe mit gültigem Zertifikat vorne. Kein Platz ist käuflich.","läuft bald ab: an Verlängerung denken","abgelaufen: neues Zertifikat veröffentlichen"],
+"tr":["Sertifika güncel","Sertifikalı","Yakınınızdaki sertifikalılar","Aynı mesafede, sertifikası güncel olan işletmeler önce gelir. Hiçbir sıra satın alınamaz.","yakında sona eriyor: yenilemeyi unutmayın","süresi doldu: yeni sertifikayı yayınlayın"],
+"id":["Sertifikat berlaku","Bersertifikat","Bersertifikat di dekat Anda","Pada jarak yang sama, tempat dengan sertifikasi yang masih berlaku tampil lebih dulu. Tidak ada posisi yang bisa dibeli.","segera berakhir: jangan lupa perbarui","kedaluwarsa: terbitkan sertifikat baru"],
+"ms":["Sijil sah","Disijilkan","Disijilkan berhampiran anda","Pada jarak yang sama, premis dengan pensijilan yang sah dipaparkan dahulu. Tiada kedudukan boleh dibeli.","akan tamat: ingat untuk memperbaharui","tamat tempoh: terbitkan sijil baharu"],
+"ru":["Сертификат действует","Сертифицированные","Сертифицированные рядом","При равном расстоянии заведения с действующим сертификатом показываются первыми. Место нельзя купить.","скоро истекает: не забудьте продлить","истёк: опубликуйте новый сертификат"],
+"zh":["证书有效","已认证","您附近的已认证商户","距离相同时，证书有效的商户排在前面。任何排名都不能购买。","即将到期：请记得续期","已过期：请发布新证书"],
+"ja":["証明書有効","認証済み","近くの認証済み店舗","同じ距離なら、有効な認証を持つ店舗が先に表示されます。順位は購入できません。","まもなく期限切れ：更新をお忘れなく","期限切れ：新しい証明書を公開してください"],
+"hi":["प्रमाणपत्र वैध","प्रमाणित","आपके पास प्रमाणित","समान दूरी पर, वैध प्रमाणन वाले प्रतिष्ठान पहले दिखते हैं। कोई स्थान खरीदा नहीं जा सकता।","जल्द समाप्त: नवीनीकरण याद रखें","समाप्त: नया प्रमाणपत्र प्रकाशित करें"],
+"bn":["সনদ বৈধ","সনদপ্রাপ্ত","আপনার কাছে সনদপ্রাপ্ত","সমান দূরত্বে, বৈধ সনদধারী প্রতিষ্ঠান আগে দেখায়। কোনো স্থান কেনা যায় না।","শীঘ্রই মেয়াদ শেষ: নবায়ন করতে ভুলবেন না","মেয়াদ শেষ: নতুন সনদ প্রকাশ করুন"],
+"ur":["سرٹیفکیٹ درست","سرٹیفائیڈ","آپ کے قریب سرٹیفائیڈ","برابر فاصلے پر، درست سرٹیفکیٹ والے کاروبار پہلے دکھائی دیتے ہیں۔ کوئی جگہ خریدی نہیں جا سکتی۔","جلد ختم: تجدید یاد رکھیں","میعاد ختم: نیا سرٹیفکیٹ شائع کریں"],
+}
+for _c, _v in X15.items():
+    assert len(_v) == len(KEYS15), _c
