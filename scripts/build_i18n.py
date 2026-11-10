@@ -3,6 +3,8 @@ import json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 from i18n_src import L, ADD_KEYS
 from i18n_extra import KEYS, X, KEYS2, X2, KEYS3, X3, KEYS4, X4, KEYS5, X5, KEYS6, X6, KEYS7, X7, KEYS8, X8, KEYS9, X9, KEYS10, X10, KEYS11, X11, KEYS12, X12, KEYS13, X13
+from i18n_orgs import KEYS14, X14
+for _c in L: L[_c].update(dict(zip(KEYS14, X14[_c])))
 for _c in L: L[_c].update(dict(zip(KEYS13, X13[_c])))
 for _c in L: L[_c].update(dict(zip(KEYS12, X12[_c])))
 for _c in L: L[_c].update(dict(zip(KEYS11, X11[_c])))

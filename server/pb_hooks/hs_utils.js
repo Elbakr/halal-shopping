@@ -154,4 +154,4 @@ function me(e) {
   return { n: a.n, days: a.d, level: l.level, w: l.w, admin: admin, known: !!f };
 }
 
-module.exports = { prepare: prepare, withdraw: withdraw, me: me };
+module.exports = { prepare: prepare, withdraw: withdraw, me: me, isAdmin: isAdmin, bodyDevice: bodyDevice };
