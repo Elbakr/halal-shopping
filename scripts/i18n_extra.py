@@ -178,3 +178,23 @@ X9 = {
 "bn":["মদ বিক্রি করে","এখানে মদ নেই","মদ বিক্রির রিপোর্ট আছে","মদ রিপোর্ট করা","হালাল হিসেবে পরিচিত","সবচেয়ে কাছের","সেরা রেটিং","সবচেয়ে বেশি নিশ্চিত","আপনার রেটিং","{n}টি রেটিং","এখানেও দেখুন","যে জায়গায় মদ বিক্রি হয় তা হালাল তালিকা থেকে বাদ যায়। এক ট্যাপে রিপোর্ট বা খণ্ডন করুন।"],
 "ur":["شراب بیچتا ہے","یہاں شراب نہیں","شراب کی فروخت کی اطلاع","شراب کی اطلاع","حلال کے طور پر مشہور","قریب ترین","بہترین ریٹنگ","سب سے زیادہ تصدیق شدہ","آپ کی ریٹنگ","{n} ریٹنگز","یہاں بھی دیکھیں","جہاں شراب بکتی ہے وہ جگہ حلال فہرست سے نکل جاتی ہے۔ ایک ٹیپ سے اطلاع دیں یا تردید کریں۔"],
 }
+
+KEYS10 = ["lvlDay","admin","adminOn","f_open","p_open","p_closedNow","pg_order"]
+X10 = {
+"fr":["Revenez un autre jour pour devenir {x}","Administrateur","Accès administrateur activé : chacun de vos constats compte pour 10.","Ouvert maintenant","Ouvert","Fermé en ce moment","Commander en ligne"],
+"nl":["Kom op een andere dag terug om {x} te worden","Beheerder","Beheerderstoegang actief: elke vaststelling van jou telt voor 10.","Nu open","Open","Nu gesloten","Online bestellen"],
+"en":["Come back another day to become {x}","Administrator","Administrator access on: each of your reports counts for 10.","Open now","Open","Closed now","Order online"],
+"ar":["عد في يوم آخر لتصبح {x}","مشرف","تم تفعيل صلاحية المشرف: كل بلاغ منك يُحتسب بعشرة.","مفتوح الآن","مفتوح","مغلق الآن","اطلب عبر الإنترنت"],
+"es":["Vuelva otro día para ser {x}","Administrador","Acceso de administrador activado: cada uno de sus avisos cuenta por 10.","Abierto ahora","Abierto","Cerrado ahora","Pedir en línea"],
+"pt":["Volte noutro dia para ser {x}","Administrador","Acesso de administrador ativo: cada sinalização sua vale por 10.","Aberto agora","Aberto","Fechado agora","Pedir online"],
+"de":["Kommen Sie an einem anderen Tag wieder, um {x} zu werden","Administrator","Administratorzugang aktiv: Jede Ihrer Meldungen zählt zehnfach.","Jetzt geöffnet","Geöffnet","Jetzt geschlossen","Online bestellen"],
+"tr":["{x} olmak için başka bir gün tekrar gelin","Yönetici","Yönetici erişimi açık: her bildiriminiz 10 sayılır.","Şimdi açık","Açık","Şu an kapalı","Online sipariş"],
+"id":["Kembali di hari lain untuk menjadi {x}","Administrator","Akses administrator aktif: setiap laporan Anda dihitung 10.","Buka sekarang","Buka","Tutup sekarang","Pesan online"],
+"ms":["Kembali pada hari lain untuk menjadi {x}","Pentadbir","Akses pentadbir aktif: setiap laporan anda dikira 10.","Dibuka sekarang","Dibuka","Ditutup sekarang","Pesan dalam talian"],
+"ru":["Вернитесь в другой день, чтобы стать «{x}»","Администратор","Доступ администратора включён: каждое ваше сообщение считается за 10.","Открыто сейчас","Открыто","Сейчас закрыто","Заказать онлайн"],
+"zh":["改天再来即可成为{x}","管理员","管理员权限已开启：您的每条反馈计为 10 条。","正在营业","营业中","当前休息","在线点餐"],
+"ja":["別の日にまた来ると{x}になれます","管理者","管理者アクセスが有効です。あなたの報告は 10 件分として数えられます。","営業中のみ","営業中","現在閉店","オンライン注文"],
+"hi":["{x} बनने के लिए किसी और दिन लौटें","व्यवस्थापक","व्यवस्थापक पहुँच चालू: आपकी हर सूचना 10 के बराबर गिनी जाती है।","अभी खुला","खुला","अभी बंद","ऑनलाइन ऑर्डर करें"],
+"bn":["{x} হতে অন্য কোনো দিন ফিরে আসুন","প্রশাসক","প্রশাসক অ্যাক্সেস চালু: আপনার প্রতিটি রিপোর্ট ১০টি হিসেবে গণ্য হয়।","এখন খোলা","খোলা","এখন বন্ধ","অনলাইনে অর্ডার করুন"],
+"ur":["{x} بننے کے لیے کسی اور دن واپس آئیں","منتظم","منتظم کی رسائی فعال: آپ کی ہر اطلاع 10 کے برابر شمار ہوتی ہے۔","ابھی کھلا ہے","کھلا","ابھی بند","آن لائن آرڈر کریں"],
+}
