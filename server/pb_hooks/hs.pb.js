@@ -28,3 +28,6 @@ routerAdd("GET", "/api/hs/org/all", (e) => require(`${__hooks}/hs_org.js`).admin
 routerAdd("POST", "/api/hs/org/review", (e) => require(`${__hooks}/hs_org.js`).review(e));
 onRecordUpdateRequest((e) => { require(`${__hooks}/hs_org.js`).guardOrg(e); e.next(); }, "orgs");
 onRecordCreateRequest((e) => { require(`${__hooks}/hs_org.js`).itemDefaults(e); e.next(); }, "org_items");
+
+// Product search by name (relevance), see hs_search.js.
+routerAdd("GET", "/api/hs/search", (e) => require(`${__hooks}/hs_search.js`).search(e));

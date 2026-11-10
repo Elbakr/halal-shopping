@@ -111,3 +111,26 @@ X15 = {
 }
 for _c, _v in X15.items():
     assert len(_v) == len(KEYS15), _c
+
+# Search by name: list of results.
+KEYS16 = ["res_t","res_l","res_none"]
+X16 = {
+"fr":["Résultats pour « {q} »","Touchez un produit pour voir son verdict.","Aucun produit trouvé pour « {q} ». Essayez avec le code-barres."],
+"nl":["Resultaten voor « {q} »","Tik op een product om het oordeel te zien.","Geen product gevonden voor « {q} ». Probeer met de streepjescode."],
+"en":["Results for “{q}”","Tap a product to see its verdict.","No product found for “{q}”. Try the barcode."],
+"ar":["نتائج « {q} »","المس منتجاً لرؤية الحكم عليه.","لم يُعثر على منتج لـ « {q} ». جرّب الرمز الشريطي."],
+"es":["Resultados para «{q}»","Toque un producto para ver su veredicto.","Ningún producto encontrado para «{q}». Pruebe con el código de barras."],
+"pt":["Resultados para «{q}»","Toque num produto para ver o veredito.","Nenhum produto encontrado para «{q}». Experimente o código de barras."],
+"de":["Ergebnisse für „{q}“","Tippen Sie auf ein Produkt, um die Bewertung zu sehen.","Kein Produkt für „{q}“ gefunden. Versuchen Sie es mit dem Strichcode."],
+"tr":["“{q}” için sonuçlar","Değerlendirmesini görmek için bir ürüne dokunun.","“{q}” için ürün bulunamadı. Barkodla deneyin."],
+"id":["Hasil untuk “{q}”","Ketuk produk untuk melihat penilaiannya.","Tidak ada produk untuk “{q}”. Coba dengan barcode."],
+"ms":["Hasil untuk “{q}”","Sentuh produk untuk melihat keputusannya.","Tiada produk ditemui untuk “{q}”. Cuba dengan kod bar."],
+"ru":["Результаты по запросу «{q}»","Нажмите на продукт, чтобы увидеть оценку.","Ничего не найдено по запросу «{q}». Попробуйте штрихкод."],
+"zh":["“{q}”的结果","点击产品查看结论。","未找到“{q}”的产品。请试试条形码。"],
+"ja":["「{q}」の検索結果","製品をタップすると判定が表示されます。","「{q}」の製品は見つかりませんでした。バーコードでお試しください。"],
+"hi":["“{q}” के परिणाम","निर्णय देखने के लिए किसी उत्पाद पर टैप करें।","“{q}” के लिए कोई उत्पाद नहीं मिला। बारकोड से कोशिश करें।"],
+"bn":["“{q}”-এর ফলাফল","রায় দেখতে একটি পণ্যে ট্যাপ করুন।","“{q}”-এর জন্য কোনো পণ্য পাওয়া যায়নি। বারকোড দিয়ে চেষ্টা করুন।"],
+"ur":["“{q}” کے نتائج","فیصلہ دیکھنے کے لیے کسی پروڈکٹ پر ٹیپ کریں۔","“{q}” کے لیے کوئی پروڈکٹ نہیں ملا۔ بارکوڈ سے کوشش کریں۔"],
+}
+for _c, _v in X16.items():
+    assert len(_v) == len(KEYS16), _c

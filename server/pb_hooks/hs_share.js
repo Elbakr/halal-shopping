@@ -4,9 +4,13 @@ var SITE = "https://halal.shopping/";
 var IMG = SITE + "og.png";
 var BOTS = /bot|crawl|spider|slurp|facebookexternalhit|facebot|whatsapp|telegram|twitter|slack|discord|linkedin|skype|pinterest|embedly|preview|vkshare|quora|redditbot|applebot|bingpreview|google/i;
 var TYPES = { r: "Restaurant", f: "Snack · fast-food", b: "Boucherie", s: "Commerce" };
-var VIDS = { e120: ["iBNySB2jpVg", "Carmin E120 : le colorant fait d'insectes écrasés"], e441: ["6bYIow9pc6M", "Gélatine E441 : fabriquée à partir de peaux et d'os"],
+var VIDS = { e120: ["0g3YcqrfiKQ", "Carmin E120 : le colorant fait d'insectes écrasés"], e441: ["Io99A2vLcT4", "Gélatine E441 : fabriquée à partir de peaux et d'os"],
   e904: ["iEkKwOWZS_E", "Gomme-laque E904 : la sécrétion d'insecte qui fait briller"], e920: ["ipTB2rgxQwk", "L-cystéine E920 : tirée de plumes et de poils"],
-  e471: ["yk1Pfsuf83Y", "E471 : mono- et diglycérides, origine animale possible"] };
+  e471: ["OchpC25nBvE", "E471 : mono- et diglycérides, origine animale possible"], e542: ["l7uhO4cUQG0", "Phosphate d'os E542 : fabriqué à partir d'os d'animaux"],
+  e422: ["OchpC25nBvE", "Glycérol E422 : végétal ou animal selon le fabricant"], e470: ["zOFFqmTzajI", "E470 : sels d'acides gras, souvent tirés du suif"],
+  e472: ["OchpC25nBvE", "E472 : esters de mono- et diglycérides, origine animale possible"], e473: ["OchpC25nBvE", "Sucroesters E473 : graisses d'origine animale possibles"],
+  e481: ["OchpC25nBvE", "E481 : stéaroyl-lactylate, acide gras d'origine animale possible"], e570: ["zOFFqmTzajI", "Acide stéarique E570 : souvent tiré du suif de bœuf ou de porc"],
+  e631: ["pfO6tH1hoEA", "E631 : inosinate, parfois tiré de viande ou de poisson"], e635: ["pfO6tH1hoEA", "E635 : ribonucléotides, origine animale possible"] };
 
 function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
 function isBot(e) { var ua = ""; try { ua = e.request.header.get("User-Agent") || ""; } catch (x) {} return !ua || BOTS.test(ua); }
