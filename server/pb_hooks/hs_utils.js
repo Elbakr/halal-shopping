@@ -52,16 +52,7 @@ function level(a, admin) {
 }
 
 // Before a contribution is saved: fingerprint, weight, and the person's opposite answer is withdrawn.
-function diag(e) {
-  const o = {};
-  try { o.realIP = typeof e.realIP; o.ip = String(e.realIP()); } catch (x) { o.ipErr = String(x); }
-  try { o.req = typeof e.request; } catch (x) {}
-  try { o.ri = Object.keys(e.requestInfo().headers || {}).join(","); } catch (x) { o.riErr = String(x); }
-  try { o.ev = Object.keys(e).slice(0, 40).join(","); } catch (x) {}
-  return JSON.stringify(o);
-}
 function prepare(e) {
-  if (e.record.get("device") === "diagdiag0001") throw new BadRequestError("diag " + diag(e));
   const rec = e.record, name = e.collection.name, f = fp(e);
   if (f) rec.set("fp", f);
   if (name !== "signals" && name !== "place_signals") return;
