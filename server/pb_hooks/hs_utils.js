@@ -129,7 +129,8 @@ function withdraw(e) {
     const wh = who(b.device);
     if (!wh || !b.key || b.key.length > 24) throw new BadRequestError("Invalid request.");
     const k2 = b.coll === "place_media" ? "id" : b.coll === "media_flags" ? "media" : "osm";
-    let f2 = k2 + " = {:key} && who = {:wh}"; const p2 = { key: b.key, wh: wh };
+    // The administrator can remove any photo or link (moderation); others only their own.
+    let f2 = k2 + " = {:key}" + (isAdmin(b.device) ? "" : " && who = {:wh}"); const p2 = { key: b.key, wh: wh };
     if (b.coll === "place_links") { f2 += " && platform = {:kind}"; p2.kind = b.kind; }
     const recs2 = $app.findRecordsByFilter(b.coll, f2, "", 20, 0, p2);
     for (let i = 0; i < recs2.length; i++) $app.delete(recs2[i]);
