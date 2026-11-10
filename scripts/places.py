@@ -145,6 +145,12 @@ def main():
     print(len(places), "named places,", sum(1 for p in places if "p" not in p), "declared", flush=True)
     if len(places) < 1000:
         print("Too few results: keeping the previous files untouched."); sys.exit(0 if os.path.isdir(OUT) else 1)
+    try:  # missing streets and postcodes from open sources, with provenance; never blocks the publication
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import enrich
+        enrich.enrich(places, budget=int(os.environ.get("ENRICH_BUDGET", "2400")))
+    except Exception as e:
+        print("Enrichment skipped:", e, flush=True)
     tiles = {}
     for p in places:
         tiles.setdefault(f"{math.floor(p['la'])}_{math.floor(p['lo'])}", []).append(p)

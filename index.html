@@ -621,7 +621,7 @@ function visiblePlaces(){return PLACES.filter(function(p){ if(hiddenPlace(p))ret
 function todoPlaces(){var d=getDone();return PLACES.filter(function(p){return p.maybe&&!p.low&&!hiddenPlace(p)&&!((PCOUNTS[p.id]||{}).confirm)&&!d["pl:"+p.id+":confirm"]&&!d["pl:"+p.id+":nothalal"]&&!d["pl:"+p.id+":closed"]&&!SKIP[p.id]})}
 function km(p){return p.d==null?"":p.d<1?Math.round(p.d*1000)+" m":p.d.toFixed(1)+" km"}
 function near(p){try{var c=JSON.parse(store("hs_rev")||"{}");return c[p.id]||""}catch(e){return ""}}
-function placeAddr(p){var s=p.addr||(near(p)?"≈ "+near(p):""),c=[p.zip,p.city].filter(Boolean).join(" ");return [s,c].filter(Boolean).join(", ")}
+function placeAddr(p){var s=p.addr||(p.ap?"≈ "+p.ap:"")||(near(p)?"≈ "+near(p):""),c=[p.zip,p.city].filter(Boolean).join(" ");return [s,c].filter(Boolean).join(", ")}
 function placeMeta(p){return [p.cuisine,km(p)].filter(Boolean).join(" · ")}
 function statusHTML(p){var cf=(PCOUNTS[p.id]||{}).confirm||0;return cf?'<span class="pt ok">'+esc(cnt("p_conf",cf))+'</span>':p.maybe?'<span class="pt mb">'+esc(t(p.added?"addedBy":"p_maybe"))+'</span>':'<span class="pt dc">'+esc(t("p_decl"))+'</span>'}
 function sigBtns(p){var d=getDone();function b(kind,key,cls){var on=d["pl:"+p.id+":"+kind],n=(PCOUNTS[p.id]||{})[kind]||0;return '<button type="button" class="pb '+cls+(on?" on":"")+'" data-pl="'+p.id+'" data-pk="'+kind+'"'+(HSAPI_OK?"":" disabled")+' aria-pressed="'+(on?"true":"false")+'">'+esc(t(key))+(n?' <i>'+n+'</i>':"")+'</button>'}
@@ -629,7 +629,7 @@ function sigBtns(p){var d=getDone();function b(kind,key,cls){var on=d["pl:"+p.id
 function routeURL(p){return "https://www.google.com/maps/dir/?api=1&destination="+p.lat+","+p.lon}
 // a street for a venue that has none on the map: nearest address, shown with "≈", fetched once and kept
 var revBusy={};
-function reverse(p,cb){ if(p.addr||near(p)||revBusy[p.id])return; revBusy[p.id]=1;
+function reverse(p,cb){ if(p.addr||p.ap||near(p)||revBusy[p.id])return; revBusy[p.id]=1;
   fetch("https://photon.komoot.io/reverse?lat="+p.lat+"&lon="+p.lon).then(function(r){return r.json()}).then(function(j){var f=j.features&&j.features[0],q=f&&f.properties; if(!q)return; var s=q.street||(q.type==="street"?q.name:""); if(!s)return;
     try{var c=JSON.parse(store("hs_rev")||"{}");var k=Object.keys(c);if(k.length>400)c={};c[p.id]=s;store("hs_rev",JSON.stringify(c))}catch(e){} if(!p.city)p.city=q.city||q.town||q.village||q.county||""; if(!p.zip&&q.postcode)p.zip=q.postcode; if(cb)cb()}).catch(function(){}) }
 var DAYS=["Mo","Tu","We","Th","Fr","Sa","Su"];
@@ -713,7 +713,7 @@ function loadPlaces(lat,lon){
     for(var a=Math.floor(lat-R);a<=Math.floor(lat+R);a++)for(var o=Math.floor(lon-dl);o<=Math.floor(lon+dl);o++){var k=a+"_"+o;if(ix.tiles[k])keys.push(k)}
     return Promise.all([addedNear(lat,lon)].concat(keys.map(function(k){return fetch("data/places/"+k+".json").then(function(r){return r.ok?r.json():[]}).catch(function(){return []})})));
   }).then(function(ts){
-    var all=ts.shift(); ts.forEach(function(v){v.forEach(function(p){all.push({id:p.i,name:p.n,lat:p.la,lon:p.lo,type:PTYPE[p.t]||"t_shop",addr:p.a||"",city:p.c||"",zip:p.z||"",cc:p.cc||"",phone:p.ph||"",web:p.w||"",hours:p.h||"",cuisine:p.k||"",maybe:!!p.p,d:dist(lat,lon,p.la,p.lo)})})});
+    var all=ts.shift(); ts.forEach(function(v){v.forEach(function(p){all.push({id:p.i,name:p.n,lat:p.la,lon:p.lo,type:PTYPE[p.t]||"t_shop",addr:p.a||"",ap:p.ap||"",city:p.c||"",zip:p.z||"",cc:p.cc||"",phone:p.ph||"",web:p.w||"",hours:p.h||"",cuisine:p.k||"",maybe:!!p.p,d:dist(lat,lon,p.la,p.lo)})})});
     var hi=function(r){return all.filter(function(p){return p.d<=r&&!p.low}).length}, R2=hi(3)>=20?3:hi(8)>=12?8:30, near=all.filter(function(p){return p.d<=R2});
     showPlaces(near,lat,lon);
   }).catch(function(){livePlaces(lat,lon,4000)});
@@ -731,7 +731,7 @@ function renderPlaces(){
   $("plist").innerHTML=V.map(function(p){ var ad=placeAddr(p), tel=(p.phone||"").replace(/[^+0-9]/g,"");
     return '<div class="pl" data-id="'+p.id+'"><div class="ptr"><span class="pt">'+esc(t(p.type))+'</span>'+statusHTML(p)+'</div><a class="pln" href="#l'+p.id+'" data-open="'+p.id+'">'+esc(p.name)+'</a>'+(ad?'<span class="pad">'+esc(ad)+'</span>':"")+'<span class="pm">'+esc(placeMeta(p))+'</span><div class="pa">'+sigBtns(p)+'</div><div class="pa"><a class="pb" target="_blank" rel="noopener" href="'+routeURL(p)+'">'+esc(t("route"))+'</a>'+(tel?'<a class="pb" href="tel:'+esc(tel)+'">'+esc(t("pg_call"))+'</a>':"")+'<a class="pb go" href="#l'+p.id+'" data-open="'+p.id+'">'+esc(t("pg_more"))+' →</a></div></div>'}).join("");
   // streets for the first cards that have none on the map
-  V.filter(function(p){return !p.addr&&!near(p)}).slice(0,8).forEach(function(p){reverse(p,function(){var c=document.querySelector('.pl[data-id="'+p.id+'"]');if(!c)return;var a=c.querySelector(".pad");if(!a){a=document.createElement("span");a.className="pad";c.insertBefore(a,c.querySelector(".pm"))}a.textContent=placeAddr(p)})});
+  V.filter(function(p){return !p.addr&&!p.ap&&!near(p)}).slice(0,8).forEach(function(p){reverse(p,function(){var c=document.querySelector('.pl[data-id="'+p.id+'"]');if(!c)return;var a=c.querySelector(".pad");if(!a){a=document.createElement("span");a.className="pad";c.insertBefore(a,c.querySelector(".pm"))}a.textContent=placeAddr(p)})});
   if(CUR)renderPage();
 }
 function drawMap(){
