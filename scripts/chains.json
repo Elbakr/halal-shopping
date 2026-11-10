@@ -1,0 +1,16 @@
+{
+  "_doc": "Halal status of chain restaurants, by brand (Wikidata id, as tagged brand:wikidata on OpenStreetMap) and country. scope all: every branch in that country is halal according to the brand or its certifier. scope list: only the branches listed in ids (OpenStreetMap ids, matched one by one to the published list). scope some: only some branches are halal and no usable list exists; branches are shown apart, to be confirmed by members. Every rule carries its source. Never add a rule without one.",
+  "brands": {"Q524757": "KFC", "Q38076": "McDonald's", "Q286494": "Quick"},
+  "rules": [
+    {"brand": "Q38076", "cc": ["SA"], "scope": "all", "src": "https://www.mcdonalds.com/sa/en-sa/riyadh/newsroom/article/rest-assured.html", "note": "McDonald's Arabie saoudite : « nos produits sont tous halal »"},
+    {"brand": "Q38076", "cc": ["AE"], "scope": "all", "src": "https://www.mcdonalds.com/ae/en-ae/newsroom/article/halal_food.html", "note": "McDonald's Émirats : produits halal"},
+    {"brand": "Q38076", "cc": ["ID"], "scope": "all", "src": "https://halalmui.org/maintaining-halal-consistency-for-32-years-lppom-mui-appreciates-mcdonalds-indonesia/", "note": "McDonald's Indonésie certifié par LPPOM MUI"},
+    {"brand": "Q38076", "cc": ["MY"], "scope": "all", "src": "https://www.malaysiakini.com/news/368079", "note": "McDonald's Malaisie certifié par JAKIM"},
+    {"brand": "Q524757", "cc": ["MY"], "scope": "all", "src": "https://qsrbrands.com/restaurants/", "note": "KFC Malaisie (QSR Brands), chaîne halal certifiée JAKIM"},
+    {"brand": "Q286494", "cc": ["FR"], "scope": "all", "src": "https://lexpress-franchise.com/actualites/quick-restaurants-halal-france-liste-complete/", "note": "Quick France : viandes certifiées par l'ARGML (Grande Mosquée de Lyon) dans tout le réseau"},
+    {"brand": "Q524757", "cc": ["FR"], "scope": "list", "src": "https://www.journaldugeek.com/2026/01/14/kfc-passe-au-100-halal-dans-quels-restaurants/", "note": "KFC France : 24 restaurants halal depuis le 21 janvier 2026, les autres non",
+     "ids": ["n13142779708", "n10878205829", "n4367630194", "w1012884357", "w52134413", "w1227215746", "n5923643154", "w458572699", "w899553075", "w1273090056", "w88909040", "n12912405271", "n1771651917", "n5259211347", "w610872125", "w1467352595", "w137353872", "n12433002785", "n12617294471", "n12433671983", "w77004153", "w730125434", "n9831801779", "n11135717216"]},
+    {"brand": "Q524757", "cc": ["GB"], "scope": "some", "src": "https://kfc.co.uk/halal", "note": "KFC Royaume-Uni : environ 200 restaurants halal certifiés HFA, sans liste publiée"},
+    {"brand": "Q524757", "cc": ["BE"], "scope": "some", "src": "", "note": "Certains KFC de Bruxelles sont halal (fondateur, 10/11/2026), sans liste publiée"}
+  ]
+}

@@ -9,7 +9,7 @@ LIKELY = ["kebab", "turkish", "pakistani", "lebanese", "moroccan", "arab", "midd
           "bangladeshi", "shawarma", "falafel", "tunisian", "algerian", "egyptian", "iraqi", "yemeni", "somali", "uzbek", "uyghur"]
 COLS = ["halal", "diet:halal", "butcher", "cuisine", "addr:street", "addr:housenumber", "addr:city", "amenity", "shop", "tourism", "craft",
         "addr:postcode", "phone", "contact:phone", "website", "contact:website", "opening_hours",
-        "drink:alcohol", "drink:beer", "drink:wine", "alcohol", "delivery", "takeaway"]
+        "drink:alcohol", "drink:beer", "drink:wine", "alcohol", "delivery", "takeaway", "brand:wikidata"]
 def sparql(where):
     opt = " ".join("OPTIONAL { ?s osmkey:%s ?v%d }" % (k, i) for i, k in enumerate(COLS))
     return ("PREFIX osmkey: <https://www.openstreetmap.org/wiki/Key:> PREFIX geo: <http://www.opengis.net/ont/geosparql#> "
@@ -31,6 +31,16 @@ WHERES = [
 # and they leave the directory like any other as soon as alcohol is reported there.
 REPUTED = {r["i"] for r in json.load(open(os.path.join(os.path.dirname(__file__), "reputed.json"), encoding="utf-8"))}
 _T = {"n": "node", "w": "way", "r": "relation"}
+# Chain restaurants: halal status by brand and country, each rule with its source (scripts/chains.json).
+CHAINS = json.load(open(os.path.join(os.path.dirname(__file__), "chains.json"), encoding="utf-8"))
+CHAIN_RULE = {}
+for _i, _r in enumerate(CHAINS["rules"]):
+    for _cc in _r["cc"]: CHAIN_RULE[(_r["brand"], _cc)] = (_i, _r)
+WHERES += [("chains", "?s osmkey:brand:wikidata ?bw . VALUES ?bw { %s }" % " ".join('"%s"' % b for b in sorted(CHAINS["brands"])))]
+# Chain supermarkets with a halal section also sell pork and alcohol: they leave the directory (alcohol filter), except where
+# the country itself is overwhelmingly Muslim and such shops are halal throughout.
+MIXED_SHOPS = {"supermarket", "convenience", "department_store", "wholesale", "hypermarket"}
+MUSLIM_CC = set("AE SA KW QA BH OM YE JO IQ SY PS EG LY TN DZ MA MR SD SO DJ KM TR AZ IR AF PK BD MV MY ID BN SN ML NE TD GM GN SL BF KZ UZ TM TJ KG AL XK".split())
 if REPUTED: WHERES += [("reputed", "VALUES ?s { %s }" % " ".join("<https://www.openstreetmap.org/%s/%s>" % (_T[i[0]], i[1:]) for i in sorted(REPUTED)))]
 _ = [
 ]
@@ -113,10 +123,22 @@ def compact(e):
     la, lo = e.get("lat", c.get("lat")), e.get("lon", c.get("lon"))
     if not name or la is None or lo is None: return None
     if not (g.get("amenity") or g.get("shop") or g.get("tourism") or g.get("craft")): return None  # closed or not a venue
-    rep = e["type"][0] + str(e["id"]) in REPUTED
+    pid = e["type"][0] + str(e["id"])
+    rep = pid in REPUTED
     dec = declared(g) or rep
+    ad = ADMIN.get(pid) or {}
+    cc, bw = ad.get("iso"), g.get("brand:wikidata")
+    chain = CHAIN_RULE.get((bw, cc)) if bw else None
+    chain_ok = chain_some = None
+    if chain:
+        ci, cr = chain
+        if cr["scope"] == "all" or (cr["scope"] == "list" and pid in cr.get("ids", [])): chain_ok = ci
+        elif cr["scope"] == "some" and not dec: chain_some = ci
+    if chain_ok is not None: dec = True
     if not dec and (g.get("diet:halal") == "no" or g.get("halal") == "no"): return None  # explicitly not halal
     likely = any(c.strip() in LIKELY for c in (g.get("cuisine") or "").split(";"))
+    if bw in CHAINS["brands"] and not dec and chain_some is None: return None  # a chain branch with no halal evidence
+    if chain_some is not None: likely = True
     if not dec and not likely:
         if g.get("shop") != "butcher" or not HINT.search(name): return None
         if g.get("butcher") in ("pork", "horse") or NOT_HALAL.search(name): return None
@@ -124,7 +146,6 @@ def compact(e):
     p = {"i": e["type"][0] + str(e["id"]), "n": name[:80], "la": round(la, 5), "lo": round(lo, 5), "t": kind(g)}
     a = " ".join(x for x in (g.get("addr:street"), g.get("addr:housenumber")) if x)
     if a: p["a"] = a[:80]
-    ad = ADMIN.get(p["i"]) or {}
     city = g.get("addr:city") or next((ad[l] for l in ("8", "7", "9", "6", "10") if ad.get(l)), None)
     if city: p["c"] = city[:40]
     if ad.get("iso"): p["cc"] = ad["iso"]
@@ -136,7 +157,10 @@ def compact(e):
     if g.get("opening_hours"): p["h"] = g["opening_hours"][:140]
     k = (g.get("cuisine") or "").split(";")[0].replace("_", " ").strip()
     if k: p["k"] = k[:30]
-    if not dec: p["p"] = 1  # likely, to be confirmed by members
+    if not dec: p["p"] = 3 if chain_some is not None else 1  # 1 likely, 3 chain where only some branches are halal
+    if chain_ok is not None: p["ch"] = chain_ok
+    if chain_some is not None: p["ch"] = chain_some
+    if bw and g.get("shop") in MIXED_SHOPS and g.get("diet:halal") != "only" and cc not in MUSLIM_CC: p["al"] = 1; p["mx"] = 1
     if rep and not declared(g): p["rp"] = 1  # reputed halal
     if any(g.get(k) in ("yes", "served", "only", "retail") for k in ("drink:alcohol", "drink:beer", "drink:wine", "alcohol")): p["al"] = 1  # alcohol on the map
     if g.get("delivery") in ("yes", "only"): p["dv"] = 1
@@ -175,6 +199,9 @@ def main():
     json.dump({"n": len(places), "declared": sum(1 for p in places if "p" not in p), "tiles": {k: len(v) for k, v in sorted(tiles.items())}},
               open(f"{tmp}/index.json", "w"), separators=(",", ":"))
     shutil.rmtree(OUT, ignore_errors=True); os.rename(tmp, OUT)
+    # Sources of the chain rules, read by the page to show "according to the brand" with its source.
+    json.dump([{"b": CHAINS["brands"][r["brand"]], "src": r["src"], "note": r["note"], "scope": r["scope"]} for r in CHAINS["rules"]],
+              open("data/chains.json", "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(len(tiles), "tiles written")
 
 if __name__ == "__main__": main()

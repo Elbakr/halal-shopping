@@ -198,3 +198,23 @@ X10 = {
 "bn":["{x} হতে অন্য কোনো দিন ফিরে আসুন","প্রশাসক","প্রশাসক অ্যাক্সেস চালু: আপনার প্রতিটি রিপোর্ট ১০টি হিসেবে গণ্য হয়।","এখন খোলা","খোলা","এখন বন্ধ","অনলাইনে অর্ডার করুন"],
 "ur":["{x} بننے کے لیے کسی اور دن واپس آئیں","منتظم","منتظم کی رسائی فعال: آپ کی ہر اطلاع 10 کے برابر شمار ہوتی ہے۔","ابھی کھلا ہے","کھلا","ابھی بند","آن لائن آرڈر کریں"],
 }
+
+KEYS11 = ["p_chain","p_chainSome","f_chain","pg_srcLink","p_mixed"]
+X11 = {
+"fr":["Halal selon l'enseigne","Certains restaurants de l'enseigne sont halal · à vérifier","Enseignes à vérifier","Source","Vend aussi des produits non halal"],
+"nl":["Halal volgens de keten","Sommige vestigingen van deze keten zijn halal · te controleren","Ketens te controleren","Bron","Verkoopt ook niet-halal producten"],
+"en":["Halal according to the chain","Some branches of this chain are halal · to be checked","Chains to check","Source","Also sells non-halal products"],
+"ar":["حلال بحسب العلامة التجارية","بعض فروع هذه السلسلة حلال · يحتاج إلى تحقق","سلاسل للتحقق","المصدر","يبيع أيضاً منتجات غير حلال"],
+"es":["Halal según la cadena","Algunos locales de la cadena son halal · por verificar","Cadenas por verificar","Fuente","También vende productos no halal"],
+"pt":["Halal segundo a cadeia","Alguns restaurantes da cadeia são halal · a verificar","Cadeias a verificar","Fonte","Também vende produtos não halal"],
+"de":["Halal laut Kette","Einige Filialen dieser Kette sind halal · zu prüfen","Ketten zu prüfen","Quelle","Verkauft auch nicht-halal Produkte"],
+"tr":["Zincire göre helal","Bu zincirin bazı şubeleri helal · doğrulanmalı","Doğrulanacak zincirler","Kaynak","Helal olmayan ürünler de satıyor"],
+"id":["Halal menurut jaringan","Sebagian cabang jaringan ini halal · perlu dicek","Jaringan yang perlu dicek","Sumber","Juga menjual produk tidak halal"],
+"ms":["Halal menurut rangkaian","Sebahagian cawangan rangkaian ini halal · perlu disemak","Rangkaian perlu disemak","Sumber","Juga menjual produk tidak halal"],
+"ru":["Халяль по данным сети","Некоторые заведения сети халяльные · нужно проверить","Сети для проверки","Источник","Продаёт и нехаляльные товары"],
+"zh":["连锁品牌声明为清真","该连锁部分门店为清真 · 待核实","待核实的连锁","来源","也出售非清真商品"],
+"ja":["チェーンによるとハラール","このチェーンの一部店舗はハラール · 要確認","確認待ちのチェーン","出典","ハラール以外の商品も販売"],
+"hi":["चेन के अनुसार हलाल","इस चेन की कुछ शाखाएँ हलाल हैं · जाँच बाकी","जाँच योग्य चेन","स्रोत","गैर-हलाल उत्पाद भी बेचता है"],
+"bn":["চেইনের তথ্য অনুযায়ী হালাল","এই চেইনের কিছু শাখা হালাল · যাচাই বাকি","যাচাইযোগ্য চেইন","সূত্র","হালাল নয় এমন পণ্যও বিক্রি করে"],
+"ur":["چین کے مطابق حلال","اس چین کی کچھ شاخیں حلال ہیں · تصدیق باقی","تصدیق طلب چینز","ماخذ","غیر حلال اشیاء بھی بیچتا ہے"],
+}
