@@ -180,3 +180,26 @@ X18 = {
 }
 for _c, _v in X18.items():
     assert len(_v) == len(KEYS18), _c
+
+# Ratings side by side.
+KEYS19 = ["th_t","th_ours","th_ta"]
+X19 = {
+"fr":["Ce qu'on en dit","{n} avis sur halal.shopping","{r}/5 · {n} avis sur TripAdvisor"],
+"nl":["Wat men erover zegt","{n} beoordelingen op halal.shopping","{r}/5 · {n} beoordelingen op TripAdvisor"],
+"en":["What people say","{n} ratings on halal.shopping","{r}/5 · {n} reviews on TripAdvisor"],
+"ar":["ماذا يقول الناس","{n} تقييم على halal.shopping","{r}/5 · {n} مراجعة على TripAdvisor"],
+"es":["Lo que se dice","{n} valoraciones en halal.shopping","{r}/5 · {n} opiniones en TripAdvisor"],
+"pt":["O que se diz","{n} avaliações no halal.shopping","{r}/5 · {n} avaliações no TripAdvisor"],
+"de":["Was man sagt","{n} Bewertungen auf halal.shopping","{r}/5 · {n} Bewertungen auf TripAdvisor"],
+"tr":["Hakkında söylenenler","halal.shopping'de {n} puan","{r}/5 · TripAdvisor'da {n} yorum"],
+"id":["Apa kata orang","{n} penilaian di halal.shopping","{r}/5 · {n} ulasan di TripAdvisor"],
+"ms":["Apa kata orang","{n} penilaian di halal.shopping","{r}/5 · {n} ulasan di TripAdvisor"],
+"ru":["Что говорят","Оценок на halal.shopping: {n}","{r}/5 · отзывов на TripAdvisor: {n}"],
+"zh":["大家怎么说","halal.shopping 上 {n} 个评分","{r}/5 · TripAdvisor 上 {n} 条点评"],
+"ja":["みんなの評価","halal.shopping の評価 {n} 件","{r}/5 · TripAdvisor の口コミ {n} 件"],
+"hi":["लोग क्या कहते हैं","halal.shopping पर {n} रेटिंग","{r}/5 · TripAdvisor पर {n} समीक्षाएँ"],
+"bn":["সবাই কী বলে","halal.shopping-এ {n}টি রেটিং","{r}/5 · TripAdvisor-এ {n}টি রিভিউ"],
+"ur":["لوگ کیا کہتے ہیں","halal.shopping پر {n} درجہ بندیاں","{r}/5 · TripAdvisor پر {n} تبصرے"],
+}
+for _c, _v in X19.items():
+    assert len(_v) == len(KEYS19), _c

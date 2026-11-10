@@ -31,3 +31,8 @@ onRecordCreateRequest((e) => { require(`${__hooks}/hs_org.js`).itemDefaults(e); 
 
 // Product search by name (relevance), see hs_search.js.
 routerAdd("GET", "/api/hs/search", (e) => require(`${__hooks}/hs_search.js`).search(e));
+
+// TripAdvisor ratings next to the community's (official Content API, key kept on the server). See hs_ta.js.
+routerAdd("GET", "/api/hs/ta", (e) => require(`${__hooks}/hs_ta.js`).lookup(e));
+routerAdd("POST", "/api/hs/admin/secret", (e) => require(`${__hooks}/hs_ta.js`).setSecret(e));
+routerAdd("GET", "/api/hs/admin/secrets", (e) => require(`${__hooks}/hs_ta.js`).secrets(e));
