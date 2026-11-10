@@ -5,7 +5,7 @@ onRecordCreateRequest((e) => {
   try { require(`${__hooks}/hs_utils.js`).prepare(e); }
   catch (err) { throw new BadRequestError(String(err && err.message || err).indexOf("Already") >= 0 ? "Already counted." : "hs prepare: " + err); }
   e.next();
-}, "signals", "place_signals", "place_ratings", "added_places", "contributions");
+}, "signals", "place_signals", "place_ratings", "added_places", "contributions", "place_media", "place_links", "media_flags");
 
 routerAdd("POST", "/api/hs/withdraw", (e) => {
   return e.json(200, require(`${__hooks}/hs_utils.js`).withdraw(e));
