@@ -1,7 +1,7 @@
 // TripAdvisor rating of a venue (official Content API). The key stays on the server; the page only gets
 // the rating, the number of reviews, TripAdvisor's rating image and the link to the listing, to show with its logo.
-const LIMIT = 4800;        // calls per month, under the 5,000 free ones
-const FRESH = 24 * 3600e3; // a rating is asked again after one day; a "no listing" answer after 30 days
+const LIMIT = 1000;        // calls per month (pay as you go, about $0.009 each: under $10 a month)
+const FRESH = 30 * 24 * 3600e3; // a rating is asked again after 30 days; a "no listing" answer after 90 days
 const API = "https://api.content.tripadvisor.com/api/v1/location/";
 const U = () => require(`${__hooks}/hs_utils.js`);
 
@@ -30,7 +30,7 @@ function lookup(e) {
   let c; try { c = $app.findFirstRecordByFilter("ta_cache", "osm = {:o}", { o: osm }); } catch (x) { c = null; }
   const age = c ? Date.now() - new Date(String(c.get("updated")).replace(" ", "T")).getTime() : 1e15;
   const out = (r) => e.json(200, r && r.get("ta") ? { rating: r.get("rating"), n: r.get("n"), url: r.get("url"), img: r.get("img") } : { none: true });
-  if (c && (c.get("ta") ? age < FRESH : age < 30 * FRESH)) return out(c);
+  if (c && (c.get("ta") ? age < FRESH : age < 3 * FRESH)) return out(c);
   try {
     if (!c) { c = new Record($app.findCollectionByNameOrId("ta_cache")); c.set("osm", osm); }
     let id = c.get("ta");
