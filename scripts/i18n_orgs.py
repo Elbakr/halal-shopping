@@ -157,3 +157,26 @@ X17 = {
 }
 for _c, _v in X17.items():
     assert len(_v) == len(KEYS17), (_c, len(_v))
+
+# Position at opening, daily streak and daily goal.
+KEYS18 = ["geoWait","geoApprox","streak","day_goal","day_done","day_ok","streak_keep"]
+X18 = {
+"fr":["Recherche de votre position…","Position approximative ({x}). Touchez « Autour de moi » pour votre position exacte.","{n} jour(s) d'affilée","Défi du jour : {c}/{g} gestes","Défi du jour réussi ! Série : {n} jour(s)","Défi du jour réussi, à demain !","Un geste aujourd'hui pour garder votre série"],
+"nl":["Uw positie wordt gezocht…","Geschatte positie ({x}). Tik op « In mijn buurt » voor uw exacte positie.","{n} dag(en) op rij","Uitdaging van de dag: {c}/{g} acties","Uitdaging gehaald! Reeks: {n} dag(en)","Uitdaging gehaald, tot morgen!","Eén actie vandaag om uw reeks te houden"],
+"en":["Finding your position…","Approximate position ({x}). Tap “Near me” for your exact position.","{n} day(s) in a row","Today's challenge: {c}/{g} actions","Challenge done! Streak: {n} day(s)","Challenge done, see you tomorrow!","One action today to keep your streak"],
+"ar":["جارٍ تحديد موقعك…","موقع تقريبي ({x}). المس « بالقرب مني » لموقعك الدقيق.","{n} يوم متتالي","تحدي اليوم: {c}/{g} مساهمات","نجحت في تحدي اليوم! السلسلة: {n} يوم","نجحت في تحدي اليوم، إلى الغد!","مساهمة واحدة اليوم للحفاظ على سلسلتك"],
+"es":["Buscando su posición…","Posición aproximada ({x}). Toque «Cerca de mí» para su posición exacta.","{n} día(s) seguidos","Reto del día: {c}/{g} gestos","¡Reto del día logrado! Racha: {n} día(s)","Reto logrado, ¡hasta mañana!","Un gesto hoy para mantener su racha"],
+"pt":["A procurar a sua posição…","Posição aproximada ({x}). Toque em «Perto de mim» para a posição exata.","{n} dia(s) seguidos","Desafio do dia: {c}/{g} gestos","Desafio cumprido! Sequência: {n} dia(s)","Desafio cumprido, até amanhã!","Um gesto hoje para manter a sequência"],
+"de":["Ihre Position wird gesucht…","Ungefähre Position ({x}). Tippen Sie auf „In meiner Nähe“ für Ihre genaue Position.","{n} Tag(e) in Folge","Tagesaufgabe: {c}/{g} Beiträge","Tagesaufgabe geschafft! Serie: {n} Tag(e)","Geschafft, bis morgen!","Ein Beitrag heute, um Ihre Serie zu halten"],
+"tr":["Konumunuz aranıyor…","Yaklaşık konum ({x}). Tam konum için « Yakınımda »ya dokunun.","Art arda {n} gün","Günün görevi: {c}/{g} katkı","Günün görevi tamam! Seri: {n} gün","Görev tamam, yarın görüşürüz!","Serinizi korumak için bugün bir katkı"],
+"id":["Mencari posisi Anda…","Posisi perkiraan ({x}). Ketuk « Di sekitar saya » untuk posisi tepat.","{n} hari berturut-turut","Tantangan hari ini: {c}/{g} aksi","Tantangan selesai! Rangkaian: {n} hari","Tantangan selesai, sampai besok!","Satu aksi hari ini untuk menjaga rangkaian Anda"],
+"ms":["Mencari kedudukan anda…","Kedudukan anggaran ({x}). Sentuh « Berhampiran saya » untuk kedudukan tepat.","{n} hari berturut-turut","Cabaran hari ini: {c}/{g} tindakan","Cabaran berjaya! Siri: {n} hari","Cabaran berjaya, jumpa esok!","Satu tindakan hari ini untuk kekalkan siri anda"],
+"ru":["Определяем ваше местоположение…","Приблизительное местоположение ({x}). Нажмите «Рядом со мной» для точного.","{n} дн. подряд","Задание дня: {c}/{g} действий","Задание дня выполнено! Серия: {n} дн.","Задание выполнено, до завтра!","Одно действие сегодня, чтобы сохранить серию"],
+"zh":["正在获取您的位置…","大致位置（{x}）。点击“我附近”获取准确位置。","连续 {n} 天","今日挑战：{c}/{g} 次贡献","今日挑战完成！连续 {n} 天","挑战完成，明天见！","今天贡献一次即可保持连续记录"],
+"ja":["現在地を取得中…","おおよその位置（{x}）。正確な位置は「現在地の近く」をタップ。","{n} 日連続","今日のチャレンジ：{c}/{g} 回","今日のチャレンジ達成！連続 {n} 日","達成！また明日！","今日1回の貢献で連続記録を維持"],
+"hi":["आपकी स्थिति खोजी जा रही है…","अनुमानित स्थिति ({x})। सटीक स्थिति के लिए « मेरे आसपास » पर टैप करें।","लगातार {n} दिन","आज की चुनौती: {c}/{g} योगदान","आज की चुनौती पूरी! सिलसिला: {n} दिन","चुनौती पूरी, कल मिलते हैं!","सिलसिला बनाए रखने के लिए आज एक योगदान"],
+"bn":["আপনার অবস্থান খোঁজা হচ্ছে…","আনুমানিক অবস্থান ({x})। সঠিক অবস্থানের জন্য « আমার আশেপাশে » চাপুন।","টানা {n} দিন","আজকের চ্যালেঞ্জ: {c}/{g} অবদান","আজকের চ্যালেঞ্জ সম্পূর্ণ! ধারা: {n} দিন","চ্যালেঞ্জ সম্পূর্ণ, কাল দেখা হবে!","ধারা বজায় রাখতে আজ একটি অবদান"],
+"ur":["آپ کی جگہ تلاش کی جا رہی ہے…","تقریبی مقام ({x})۔ درست مقام کے لیے « میرے آس پاس » پر ٹیپ کریں۔","مسلسل {n} دن","آج کا چیلنج: {c}/{g} شراکتیں","آج کا چیلنج مکمل! سلسلہ: {n} دن","چیلنج مکمل، کل ملتے ہیں!","اپنا سلسلہ برقرار رکھنے کے لیے آج ایک شراکت"],
+}
+for _c, _v in X18.items():
+    assert len(_v) == len(KEYS18), _c

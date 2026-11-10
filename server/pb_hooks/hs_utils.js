@@ -123,7 +123,7 @@ function prepare(e) {
 
 // A person withdraws one of their own answers, recognised by device id or by fingerprint.
 function withdraw(e) {
-  const b = new DynamicModel({ coll: "", key: "", kind: "", device: "" });
+  const b = new DynamicModel({ coll: "", key: "", kind: "", device: "", mins: 0 });
   e.bindBody(b);
   if (b.coll === "place_media" || b.coll === "place_links" || b.coll === "media_flags") {
     const wh = who(b.device);
@@ -141,6 +141,11 @@ function withdraw(e) {
   if (!k || !b.key || b.key.length > 24) throw new BadRequestError("Invalid request.");
   let filter = k + " = {:key} && (fp = {:f} || device = {:d})";
   const params = { key: b.key, f: fp(e) || "-", d: b.device || "-" };
+  // Moderation: the administrator removes the answers given on one item during the last minutes (e.g. a test).
+  if (isAdmin(b.device) && b.mins > 0 && b.mins <= 1440) {
+    filter = k + " = {:key} && created >= {:since}";
+    params.since = new Date(Date.now() - b.mins * 60000).toISOString().replace("T", " ");
+  }
   if (b.coll !== "place_ratings") { filter += " && kind = {:kind}"; params.kind = b.kind; }
   const recs = $app.findRecordsByFilter(b.coll, filter, "", 20, 0, params);
   for (let i = 0; i < recs.length; i++) $app.delete(recs[i]);
