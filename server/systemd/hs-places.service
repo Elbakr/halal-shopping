@@ -6,4 +6,4 @@ After=network-online.target
 Type=oneshot
 ExecStart=/opt/hs/gen.sh
 Nice=10
-MemoryMax=1400M
+MemoryMax=650M

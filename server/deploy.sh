@@ -31,6 +31,8 @@ CH=0
 for u in hs-places.service hs-places.timer; do cmp -s "server/systemd/$u" "/etc/systemd/system/$u" || { cp "server/systemd/$u" "/etc/systemd/system/$u"; CH=1; }; done
 if [ "$CH" = 1 ]; then systemctl daemon-reload; systemctl enable --now hs-places.timer >/dev/null 2>&1; fi
 [ "$FIRST" = 1 ] && systemctl start --no-block hs-places.service
+# Bump server/places-run to request an extra run now.
+if [ -f server/places-run ] && ! cmp -s server/places-run /opt/hs/.places-run; then cp server/places-run /opt/hs/.places-run; systemctl start --no-block hs-places.service; fi
 {
   echo "time: $(date -u +%FT%TZ)"
   echo "deployed: $(cat /opt/hs/.deployed 2>/dev/null)"
@@ -41,6 +43,8 @@ if [ "$CH" = 1 ]; then systemctl daemon-reload; systemctl enable --now hs-places
   echo "disk: $(df -h / | tail -1 | awk '{print $3" / "$2}')"
   echo "memory: $(free -m | awk '/Mem:/{print $3" / "$2" MB"}')"
   cat /var/www/status/places.txt 2>/dev/null || echo "places: never run"
+  echo "places service: $(systemctl is-active hs-places.service) (result $(systemctl show hs-places.service -p Result --value 2>/dev/null))"
+  journalctl -u hs-places.service -n 4 --no-pager 2>/dev/null | cut -c1-200
   echo "places timer: $(systemctl is-active hs-places.timer) next $(systemctl show hs-places.timer -p NextElapseUSecRealtime --value 2>/dev/null)"
   echo "contributions: $(ls /opt/hs/pb/pb_data/storage 2>/dev/null | wc -l) storage dirs"
   echo "--- pocketbase log (errors only)"
