@@ -9,7 +9,7 @@ LIKELY = ["kebab", "turkish", "pakistani", "lebanese", "moroccan", "arab", "midd
           "bangladeshi", "shawarma", "falafel", "tunisian", "algerian", "egyptian", "iraqi", "yemeni", "somali", "uzbek", "uyghur"]
 COLS = ["halal", "diet:halal", "butcher", "cuisine", "addr:street", "addr:housenumber", "addr:city", "amenity", "shop", "tourism", "craft",
         "addr:postcode", "phone", "contact:phone", "website", "contact:website", "opening_hours",
-        "drink:alcohol", "drink:beer", "drink:wine", "alcohol", "delivery", "takeaway", "brand:wikidata"]
+        "drink:alcohol", "drink:beer", "drink:wine", "alcohol", "delivery", "takeaway", "brand:wikidata", "reservation"]
 def sparql(where):
     opt = " ".join("OPTIONAL { ?s osmkey:%s ?v%d }" % (k, i) for i, k in enumerate(COLS))
     return ("PREFIX osmkey: <https://www.openstreetmap.org/wiki/Key:> PREFIX geo: <http://www.opengis.net/ont/geosparql#> "
@@ -163,6 +163,8 @@ def compact(e):
     if bw and g.get("shop") in MIXED_SHOPS and g.get("diet:halal") != "only" and cc not in MUSLIM_CC: p["al"] = 1; p["mx"] = 1
     if rep and not declared(g): p["rp"] = 1  # reputed halal
     if any(g.get(k) in ("yes", "served", "only", "retail") for k in ("drink:alcohol", "drink:beer", "drink:wine", "alcohol")): p["al"] = 1  # alcohol on the map
+    if g.get("reservation") in ("yes", "recommended"): p["rv"] = 1  # table booking possible / advised
+    if g.get("reservation") == "required": p["rv"] = 2
     if g.get("delivery") in ("yes", "only"): p["dv"] = 1
     if g.get("takeaway") in ("yes", "only"): p["tk"] = 1
     return p

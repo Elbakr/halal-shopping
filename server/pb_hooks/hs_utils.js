@@ -64,7 +64,7 @@ function metres(a, b, c, d) {
 const DOMAINS = {
   ubereats: /(^|\.)ubereats\.com$/, deliveroo: /(^|\.)deliveroo\.[a-z.]+$/,
   takeaway: /(^|\.)(takeaway\.com|thuisbezorgd\.nl|lieferando\.(de|at)|just-eat\.[a-z.]+|justeat\.it|pyszne\.pl)$/,
-  instagram: /(^|\.)instagram\.com$/, facebook: /(^|\.)(facebook|fb)\.com$/, tiktok: /(^|\.)tiktok\.com$/, website: /./,
+  booking: /./, instagram: /(^|\.)instagram\.com$/, facebook: /(^|\.)(facebook|fb)\.com$/, tiktok: /(^|\.)tiktok\.com$/, website: /./,
 };
 // Photos and links: author hash, weight, distance to the venue; links checked against their platform, one per person.
 function prepareProof(e, name) {
