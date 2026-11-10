@@ -55,8 +55,17 @@ function level(a, admin) {
 function prepare(e) {
   const rec = e.record, name = e.collection.name, f = fp(e);
   if (f) rec.set("fp", f);
+  if (name === "place_ratings") {
+    const had = $app.findRecordsByFilter(name, "osm = {:k} && (fp = {:f} || device = {:d})", "", 1, 0, { k: rec.get("osm"), f: f || "-", d: rec.get("device") || "-" });
+    if (had.length) throw new BadRequestError("Already rated.");
+    return;
+  }
   if (name !== "signals" && name !== "place_signals") return;
   const key = name === "signals" ? "code" : "osm", device = rec.get("device");
+  // The same person giving the same answer twice (new browser id, private browsing...) is one answer.
+  const same = $app.findRecordsByFilter(name, key + " = {:k} && kind = {:o} && (fp = {:f} || device = {:d})", "", 1, 0,
+    { k: rec.get(key), o: rec.get("kind"), f: f || "-", d: device || "-" });
+  if (same.length) throw new BadRequestError("Already counted.");
   const opp = OPP[rec.get("kind")];
   if (opp) {
     const olds = $app.findRecordsByFilter(name, key + " = {:k} && kind = {:o} && (fp = {:f} || device = {:d})", "", 20, 0,

@@ -3,7 +3,7 @@
 
 onRecordCreateRequest((e) => {
   try { require(`${__hooks}/hs_utils.js`).prepare(e); }
-  catch (err) { throw new BadRequestError("hs prepare: " + err); }
+  catch (err) { throw new BadRequestError(String(err && err.message || err).indexOf("Already") >= 0 ? "Already counted." : "hs prepare: " + err); }
   e.next();
 }, "signals", "place_signals", "place_ratings", "added_places", "contributions");
 
