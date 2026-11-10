@@ -8,7 +8,8 @@ OUT = "data/places"
 LIKELY = ["kebab", "turkish", "pakistani", "lebanese", "moroccan", "arab", "middle_eastern", "afghan", "syrian", "persian",
           "bangladeshi", "shawarma", "falafel", "tunisian", "algerian", "egyptian", "iraqi", "yemeni", "somali", "uzbek", "uyghur"]
 COLS = ["halal", "diet:halal", "butcher", "cuisine", "addr:street", "addr:housenumber", "addr:city", "amenity", "shop", "tourism", "craft",
-        "addr:postcode", "phone", "contact:phone", "website", "contact:website", "opening_hours"]
+        "addr:postcode", "phone", "contact:phone", "website", "contact:website", "opening_hours",
+        "drink:alcohol", "drink:beer", "drink:wine", "alcohol", "delivery", "takeaway"]
 def sparql(where):
     opt = " ".join("OPTIONAL { ?s osmkey:%s ?v%d }" % (k, i) for i, k in enumerate(COLS))
     return ("PREFIX osmkey: <https://www.openstreetmap.org/wiki/Key:> PREFIX geo: <http://www.opengis.net/ont/geosparql#> "
@@ -25,6 +26,13 @@ WHERES = [
     ("declared", '{ ?s osmkey:diet:halal ?h . FILTER(?h = "yes" || ?h = "only") } UNION { ?s osmkey:halal "yes" } UNION { ?s osmkey:butcher "halal" }'),
     ("likely", '?s osmkey:cuisine ?cu . FILTER REGEX(?cu, "%s")' % RX.replace("\\", "\\\\")),
     ("butchers", '?s osmkey:shop "butcher" .'),
+]
+# Venues reputed halal (local references named by the founder). Listed as "reputed", never as declared or certified,
+# and they leave the directory like any other as soon as alcohol is reported there.
+REPUTED = {r["i"] for r in json.load(open(os.path.join(os.path.dirname(__file__), "reputed.json"), encoding="utf-8"))}
+_T = {"n": "node", "w": "way", "r": "relation"}
+if REPUTED: WHERES += [("reputed", "VALUES ?s { %s }" % " ".join("<https://www.openstreetmap.org/%s/%s>" % (_T[i[0]], i[1:]) for i in sorted(REPUTED)))]
+_ = [
 ]
 QUERIES = [(l, sparql(w)) for l, w in WHERES]
 ADMIN = {}  # "n123" -> {"8": "Schaerbeek", "2": "België / Belgique / Belgien", "iso": "BE"}
@@ -105,7 +113,8 @@ def compact(e):
     la, lo = e.get("lat", c.get("lat")), e.get("lon", c.get("lon"))
     if not name or la is None or lo is None: return None
     if not (g.get("amenity") or g.get("shop") or g.get("tourism") or g.get("craft")): return None  # closed or not a venue
-    dec = declared(g)
+    rep = e["type"][0] + str(e["id"]) in REPUTED
+    dec = declared(g) or rep
     if not dec and (g.get("diet:halal") == "no" or g.get("halal") == "no"): return None  # explicitly not halal
     likely = any(c.strip() in LIKELY for c in (g.get("cuisine") or "").split(";"))
     if not dec and not likely:
@@ -128,6 +137,10 @@ def compact(e):
     k = (g.get("cuisine") or "").split(";")[0].replace("_", " ").strip()
     if k: p["k"] = k[:30]
     if not dec: p["p"] = 1  # likely, to be confirmed by members
+    if rep and not declared(g): p["rp"] = 1  # reputed halal
+    if any(g.get(k) in ("yes", "served", "only", "retail") for k in ("drink:alcohol", "drink:beer", "drink:wine", "alcohol")): p["al"] = 1  # alcohol on the map
+    if g.get("delivery") in ("yes", "only"): p["dv"] = 1
+    if g.get("takeaway") in ("yes", "only"): p["tk"] = 1
     return p
 
 def main():
