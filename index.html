@@ -665,6 +665,11 @@ function findPlace(id){for(var i=0;i<PLACES.length;i++)if(PLACES[i].id===id)retu
     var el=null,la=0,lo=0,n=0;(j.elements||[]).forEach(function(e){if(e.type===ty&&String(e.id)===id.slice(1))el=e;if(e.type==="node"){la+=e.lat;lo+=e.lon;n++}}); if(!el||!n)throw 0; var g=el.tags||{};
     return {id:id,name:g.name||"",lat:el.lat||la/n,lon:el.lon||lo/n,type:ptype(g),addr:[g["addr:street"],g["addr:housenumber"]].filter(Boolean).join(" "),city:g["addr:city"]||"",zip:g["addr:postcode"]||"",phone:g.phone||g["contact:phone"]||"",web:g.website||g["contact:website"]||"",hours:g.opening_hours||"",cuisine:(g.cuisine||"").split(";")[0].replace(/_/g," "),deliv:g.delivery==="yes",take:g.takeaway==="yes",alc:["drink:alcohol","drink:beer","drink:wine","alcohol"].some(function(k){return /^(yes|served|only|retail)$/.test(g[k]||"")}),
       maybe:!(g["diet:halal"]==="yes"||g["diet:halal"]==="only"||g.halal==="yes"||g.butcher==="halal"||/halal|helal|حلال/i.test(g.name||""))}}) }
+// A venue opened by its link: complete it with what the directory holds for it (status, street, municipality...)
+function fromTile(p){ if(p.id[0]==="u")return Promise.resolve(p);
+  return fetch("data/places/"+Math.floor(p.lat)+"_"+Math.floor(p.lon)+".json").then(function(r){return r.ok?r.json():[]}).then(function(v){
+    for(var i=0;i<v.length;i++)if(v[i].i===p.id){var x=v[i];p.addr=x.a||p.addr;p.ap=x.ap||"";p.city=x.c||p.city;p.zip=x.z||p.zip;p.phone=x.ph||p.phone;p.web=x.w||p.web;p.hours=x.h||p.hours;p.maybe=!!x.p;p.rep=!!x.rp;p.alc=!!x.al||p.alc;p.deliv=!!x.dv;p.take=!!x.tk;break}
+    return p}).catch(function(){return p}) }
 function renderPage(){
   var p=CUR; if(!p)return; var tel=(p.phone||"").replace(/[^+0-9]/g,""), web=/^https?:\/\//.test(p.web||"")?p.web:"", ad=placeAddr(p);
   $("ppb").innerHTML='<div class="ptr"><span class="pt">'+esc(t(p.type))+'</span>'+statusHTML(p)+'</div><h2>'+esc(p.name)+'</h2>'+
@@ -686,7 +691,7 @@ function pageCounts(p){var id=p.id,f=encodeURIComponent("(osm='"+id+"')");
   fetch(HSAPI+"/api/collections/place_counts/records?filter="+f).then(function(r){return r.ok?r.json():null}).then(function(j){if(!j||CUR!==p)return;delete PCOUNTS[id];(j.items||[]).forEach(function(x){(PCOUNTS[x.osm]=PCOUNTS[x.osm]||{})[x.kind]=x.n});renderPage()}).catch(function(){});
   fetch(HSAPI+"/api/collections/place_rating_avg/records?filter="+f).then(function(r){return r.ok?r.json():null}).then(function(j){if(!j||CUR!==p)return;delete RATES[id];if(j.items&&j.items[0])RATES[id]={avg:j.items[0].avg,n:j.items[0].n};renderPage()}).catch(function(){}) }
 function openPlace(id,push){
-  findPlace(id).then(function(p){ if(!p.name)throw 0; CUR=p; $("pp").hidden=false; document.body.style.overflow="hidden"; $("pp").scrollTop=0; renderPage(); reverse(p,function(){if(CUR===p){var a=$("ppb").querySelector(".ppa");if(a)a.textContent=placeAddr(p);else renderPage()}});
+  findPlace(id).then(function(p){return p.d==null?fromTile(p):p}).then(function(p){ if(!p.name)throw 0; CUR=p; $("pp").hidden=false; document.body.style.overflow="hidden"; $("pp").scrollTop=0; renderPage(); reverse(p,function(){if(CUR===p){var a=$("ppb").querySelector(".ppa");if(a)a.textContent=placeAddr(p);else renderPage()}});
     if(push){try{history.pushState(null,"",location.pathname+location.search+"#l"+id)}catch(e){}}
     if(HSAPI_OK)pageCounts(p);
   }).catch(function(){toast(t("offline"))});
