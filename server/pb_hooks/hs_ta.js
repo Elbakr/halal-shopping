@@ -1,6 +1,6 @@
 // TripAdvisor rating of a venue (official Content API). The key stays on the server; the page only gets
 // the rating, the number of reviews, TripAdvisor's rating image and the link to the listing, to show with its logo.
-const LIMIT = 1600;        // listings per month: 1,000 free, then about $0.015 each (cap near $9)
+const LIMIT = 600;         // listings per month, $0.015 each in the checkout grid: at most about $9 a month
 const FRESH = 30 * 24 * 3600e3; // a rating is asked again after 30 days
 const API = "https://api.content.tripadvisor.com/api/v1/location/";
 const U = () => require(`${__hooks}/hs_utils.js`);
