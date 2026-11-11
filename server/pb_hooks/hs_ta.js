@@ -14,7 +14,7 @@ function spend(k) { // count calls; false when the month's allowance is used up
 }
 function get(url) {
   const res = $http.send({ url: url, method: "GET", timeout: 8, headers: { accept: "application/json", Referer: "https://halal.shopping/" } });
-  if (res.statusCode !== 200) throw new Error("TripAdvisor " + res.statusCode);
+  if (res.statusCode !== 200) throw new Error("TripAdvisor " + res.statusCode + " " + String(res.raw || "").slice(0, 300));
   return res.json;
 }
 
@@ -28,7 +28,7 @@ function lookup(e) {
   let c; try { c = $app.findFirstRecordByFilter("ta_cache", "osm = {:o}", { o: osm }); } catch (x) { c = null; }
   const age = c ? Date.now() - new Date(String(c.get("updated")).replace(" ", "T")).getTime() : 1e15;
   const out = (r) => e.json(200, r && r.get("ta") ? { rating: r.get("rating"), n: r.get("n"), url: r.get("url"), img: r.get("img") } : { none: true });
-  if (c && (c.get("ta") ? age < FRESH : age < 3 * FRESH)) return out(c);
+  if (c && c.get("ta") && age < FRESH && !q.get("device")) return out(c);
   try {
     if (!c) { c = new Record($app.findCollectionByNameOrId("ta_cache")); c.set("osm", osm); }
     let id = c.get("ta");
@@ -46,6 +46,7 @@ function lookup(e) {
     $app.save(c);
     return out(c);
   } catch (x) {
+    if (U().isAdmin(String(q.get("device") || ""))) return e.json(200, { error: String(x).slice(0, 400) });
     return out(c && c.get("url") ? c : null);
   }
 }
