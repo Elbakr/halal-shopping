@@ -63,7 +63,8 @@ function setSecret(e) {
 function secrets(e) {
   if (!U().isAdmin(e.request.url.query().get("device") || "")) return e.json(403, { message: "Admin only." });
   let used = 0; try { used = $app.findFirstRecordByFilter("ta_usage", "month = {:m}", { m: month() }).get("n"); } catch (x) {}
-  return e.json(200, { tripadvisor: !!secret("tripadvisor"), used: used, limit: LIMIT });
+  const k = secret("tripadvisor");
+  return e.json(200, { tripadvisor: !!k, ends: k ? k.slice(-4) : "", length: k.length, used: used, limit: LIMIT });
 }
 
 module.exports = { lookup: lookup, setSecret: setSecret, secrets: secrets };

@@ -1245,7 +1245,7 @@ function openOrgPublic(id,n){ if(!HSAPI_OK){if((n||0)<8)setTimeout(function(){op
   }).catch(function(){toast(t("offline"))}) }
 // admin: review organisations
 function openAdmSet(){ fetch(HSAPI+"/api/hs/admin/secrets?device="+device()).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){
-  omOpen('<h2>'+esc(t("adm_set"))+'</h2><div class="ppbox ofm"><h3>TripAdvisor</h3><p class="src">'+esc(j.tripadvisor?t("adm_ta_on").replace("{n}",j.used).replace("{m}",j.limit):t("adm_ta_off"))+'</p><label class="of"><span>'+esc(t("adm_ta_key"))+'</span><input id="taKey" type="password" autocomplete="off" spellcheck="false"></label><button type="button" class="btn solid" id="taSave">'+esc(t("org_save"))+'</button></div>')
+  omOpen('<h2>'+esc(t("adm_set"))+'</h2><div class="ppbox ofm"><h3>TripAdvisor</h3><p class="src">'+esc(j.tripadvisor?t("adm_ta_on").replace("{n}",j.used).replace("{m}",j.limit)+(j.ends?" (…"+j.ends+")":""):t("adm_ta_off"))+'</p><label class="of"><span>'+esc(t("adm_ta_key"))+'</span><input id="taKey" type="password" autocomplete="off" spellcheck="false"></label><button type="button" class="btn solid" id="taSave">'+esc(t("org_save"))+'</button></div>')
 }).catch(function(){toast(t("offline"))}) }
 function openOrgAdmin(){ fetch(HSAPI+"/api/hs/org/all?device="+device()).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){
   omOpen('<h2>'+esc(t("org_adm_t"))+'</h2>'+(j.orgs.length?j.orgs.map(function(o){return '<div class="ppbox"><b>'+esc(o.name)+'</b><span class="ost '+o.status+'">'+esc(t("org_"+o.status))+'</span><p class="src">'+esc([t("k_"+o.kind),o.country?region(o.country):"",o.regno,o.items+" ✓"].filter(Boolean).join(" · "))+'</p><p>'+
