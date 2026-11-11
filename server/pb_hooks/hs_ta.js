@@ -35,9 +35,10 @@ function lookup(e) {
   let c; try { c = $app.findFirstRecordByFilter("ta_cache", "osm = {:o}", { o: osm }); } catch (x) { c = null; }
   if (!c) { c = new Record($app.findCollectionByNameOrId("ta_cache")); c.set("osm", osm); }
   try {
-    if (c.get("ta") !== id || !c.get("al")) { // put the listing on our allowlist (free), once
-      call("POST", "allowlist", key, { allowlist: [parseInt(id, 10)], operation_type: "APPEND" });
-      c.set("ta", id); c.set("al", true); $app.save(c);
+    if (c.get("ta") !== id || !c.get("al")) { // put the listing on our allowlist (free), once; some plans have none
+      c.set("ta", id);
+      try { call("POST", "allowlist", key, { allowlist: [parseInt(id, 10)], operation_type: "APPEND" }); c.set("al", true); } catch (x) { if (dbg) console.log("allowlist:", String(x).slice(0, 200)); }
+      $app.save(c);
     }
     if (!spend(1)) return e.json(200, { none: true, cap: true });
     const d = call("GET", "locations/" + id + "?version=1&locale=" + (LOC[lang] || "en-US"), key);
