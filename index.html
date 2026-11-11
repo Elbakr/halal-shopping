@@ -810,7 +810,7 @@ var DLV={BE:"deliveroo.be",FR:"deliveroo.fr",GB:"deliveroo.co.uk",IT:"deliveroo.
     TKW={BE:["Takeaway.com","takeaway.com"],NL:["Thuisbezorgd","thuisbezorgd.nl"],DE:["Lieferando","lieferando.de"],AT:["Lieferando","lieferando.at"],GB:["Just Eat","just-eat.co.uk"],FR:["Just Eat","just-eat.fr"],CH:["Just Eat","just-eat.ch"],ES:["Just Eat","just-eat.es"],IE:["Just Eat","just-eat.ie"],IT:["Just Eat","justeat.it"],DK:["Just Eat","just-eat.dk"]};
 function gsite(site,p){return "https://www.google.com/search?q="+encodeURIComponent("site:"+site+" "+p.name+(p.city?" "+p.city.split(" - ")[0]:""))}
 function lnk(u,t){return '<a target="_blank" rel="noopener nofollow" href="'+u+'">'+esc(t)+'</a>'}
-var PLAT={booking:"Réservation en ligne",ubereats:"Uber Eats",deliveroo:"Deliveroo",takeaway:"Takeaway.com",website:"Site web",instagram:"Instagram",facebook:"Facebook",tiktok:"TikTok"},
+var PLAT={booking:"Réservation en ligne",tripadvisor:"TripAdvisor",ubereats:"Uber Eats",deliveroo:"Deliveroo",takeaway:"Takeaway.com",website:"Site web",instagram:"Instagram",facebook:"Facebook",tiktok:"TikTok"},
     LINKS={}, MEDIA={}, MFLAG={}, phKind="other";
 // The exact page brought by a member wins; otherwise a plain search (name, commune, platform), clearly labelled as a search.
 function bestLink(id,pl){var a=(LINKS[id]||[]).filter(function(x){return x.platform===pl});a.sort(function(x,y){return ((y.w||1)-(x.w||1))||(y.created>x.created?1:-1)});return a[0]}
@@ -833,7 +833,7 @@ function bookSend(){ var p=CUR; if(!p)return; var n=intlPhone(p), tel=(p.phone||
   if(n&&isMobile(n)){var u=(MOBILE?"whatsapp://send?phone="+n+"&text=":"https://wa.me/"+n+"?text=")+encodeURIComponent(m); if(MOBILE)location.href=u; else window.open(u,"_blank","noopener"); return}
   if(navigator.clipboard)navigator.clipboard.writeText(m).catch(function(){}); location.href="tel:"+tel }
 function seeLinks(p){
-  var o=lnk("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(p.name)+"%20"+p.lat+"%2C"+p.lon,"Google Maps")+lnk("https://www.tripadvisor.com/Search?q="+encodeURIComponent(p.name+(p.city?" "+p.city.split(" - ")[0]:"")),"TripAdvisor");
+  var o=lnk("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(p.name)+"%20"+p.lat+"%2C"+p.lon,"Google Maps")+(bestLink(p.id,"tripadvisor")?'<a class="exact" target="_blank" rel="noopener nofollow" href="'+esc(bestLink(p.id,"tripadvisor").url)+'">✓ TripAdvisor</a>':lnk("https://www.tripadvisor.com/Search?q="+encodeURIComponent(p.name+(p.city?" "+p.city.split(" - ")[0]:"")),"TripAdvisor"));
   ["website","instagram","facebook","tiktok"].forEach(function(k){var x=bestLink(p.id,k);if(x)o+='<a class="exact" target="_blank" rel="noopener nofollow" href="'+esc(x.url)+'">✓ '+esc(k==="website"?t("pg_site"):PLAT[k])+'</a>'});
   if(p.type==="t_rest"||p.type==="t_fast"){ var d='<span class="seeT">'+esc(t("pg_order"))+'</span>';
     [["ubereats","Uber Eats"],DLV[p.cc]?["deliveroo","Deliveroo"]:null,TKW[p.cc]?["takeaway",TKW[p.cc][0]]:null].forEach(function(q){ if(!q)return; var x=bestLink(p.id,q[0]);
@@ -868,7 +868,7 @@ function sendMedia(p,file,kind){ toast(t("loading"));
     .then(function(r){ if(!r.ok)throw 0; markDone("ph:"+p.id+":"+Date.now()); toast(t("ph_sent")); loadProof(p) }).catch(function(){toast(t("sendFail"))}) }
 function sendLink(p){ var pl=$("lkP").value, u=$("lkU").value.trim(); if(!u){$("lkU").focus();return} if(!/^https?:\/\//i.test(u))u="https://"+u;
   fetch(HSAPI+"/api/collections/place_links/records",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({osm:p.id,platform:pl,url:u,device:device()})})
-    .then(function(r){ if(r.ok){markDone("lk:"+p.id+":"+pl);toast(t("lk_ok"));loadProof(p)} else toast(t("lk_bad")) }).catch(function(){toast(t("sendFail"))}) }
+    .then(function(r){ if(r.ok){markDone("lk:"+p.id+":"+pl);toast(t("lk_ok"));loadProof(p);if(pl==="tripadvisor"){delete TAC[p.id];setTimeout(function(){loadTA(p)},800)}} else toast(t("lk_bad")) }).catch(function(){toast(t("sendFail"))}) }
 function flagMedia(id){ fetch(HSAPI+"/api/collections/media_flags/records",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({media:id,device:device()})})
     .then(function(r){ if(r.ok||r.status===400){toast(t("thanks"));if(r.ok)MFLAG[id]=(MFLAG[id]||0)+(ME&&ME.w||1);if(CUR)renderPage()} }).catch(function(){toast(t("sendFail"))}) }
 function routeURL(p){return "https://www.google.com/maps/dir/?api=1&destination="+p.lat+","+p.lon}
