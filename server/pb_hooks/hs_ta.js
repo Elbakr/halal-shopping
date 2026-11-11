@@ -1,53 +1,53 @@
-// TripAdvisor rating of a venue (official Content API). The key stays on the server; the page only gets
-// the rating, the number of reviews, TripAdvisor's rating image and the link to the listing, to show with its logo.
-const LIMIT = 600;         // listings per month, $0.015 each in the checkout grid: at most about $9 a month
-const FRESH = 30 * 24 * 3600e3; // a rating is asked again after 30 days
-const API = "https://api.content.tripadvisor.com/api/v1/location/";
+// TripAdvisor rating of a venue, through the official Terra API (https://docs.terra.tripadvisor.com).
+// The key stays on the server. The listing comes from the TripAdvisor link added to the venue (…-d123456-…): no
+// searches, which are billed per listing returned. TripAdvisor allows keeping only the listing ID, so the rating is
+// read live each time a venue page asks for it, within a monthly cap (each read is billed: about $0.015).
+const LIMIT = 600; // reads per month: at most about $9
+const BASE = "https://terra.tripadvisor.com/api/";
+const LOC = { fr: "fr-FR", nl: "nl-NL", en: "en-US", de: "de-DE", es: "es-ES", pt: "pt-PT", tr: "tr-TR", ar: "ar", id: "id-ID", ms: "en-MY", ru: "ru-RU", zh: "zh-CN", ja: "ja-JP", hi: "en-IN", bn: "en-IN", ur: "en-IN" };
 const U = () => require(`${__hooks}/hs_utils.js`);
 
 function secret(name) { try { return $app.findFirstRecordByFilter("hs_secrets", "name = {:n}", { n: name }).get("value") || ""; } catch (x) { return ""; } }
 function month() { return new Date().toISOString().slice(0, 7); }
-function spend(k) { // count calls; false when the month's allowance is used up
+function spend(k) { // count reads; false when the month's cap is reached
   let r; try { r = $app.findFirstRecordByFilter("ta_usage", "month = {:m}", { m: month() }); } catch (x) { r = new Record($app.findCollectionByNameOrId("ta_usage")); r.set("month", month()); r.set("n", 0); }
   if (r.get("n") + k > LIMIT) return false;
   r.set("n", r.get("n") + k); $app.save(r); return true;
 }
-function get(url) {
-  const res = $http.send({ url: url, method: "GET", timeout: 8, headers: { accept: "application/json", Referer: "https://halal.shopping/" } });
-  if (res.statusCode !== 200) throw new Error("TripAdvisor " + res.statusCode + " " + String(res.raw || "").slice(0, 300));
+function call(method, path, key, body) {
+  const res = $http.send({ url: BASE + path, method: method, timeout: 8, body: body ? JSON.stringify(body) : "",
+    headers: { "X-API-Key": key, accept: "application/json", "content-type": "application/json" } });
+  if (res.statusCode < 200 || res.statusCode > 299) throw new Error("TripAdvisor " + res.statusCode + " " + String(res.raw || "").slice(0, 300));
   return res.json;
 }
 
 function lookup(e) {
   const q = e.request.url.query();
-  const osm = String(q.get("osm") || ""), name = String(q.get("name") || "").slice(0, 80);
-  const lat = parseFloat(q.get("lat")), lon = parseFloat(q.get("lon")), lang = String(q.get("lang") || "fr").replace(/[^a-z]/g, "").slice(0, 2) || "fr";
-  if (!/^[nwr]\d{1,20}$/.test(osm) || !name || isNaN(lat) || isNaN(lon)) return e.json(400, { message: "Bad request." });
+  const osm = String(q.get("osm") || ""), lang = String(q.get("lang") || "fr").replace(/[^a-z]/g, "").slice(0, 2) || "fr";
+  const dbg = U().isAdmin(String(q.get("device") || ""));
+  if (!/^[nwr]\d{1,20}$/.test(osm)) return e.json(400, { message: "Bad request." });
   const key = secret("tripadvisor");
   if (!key) return e.json(200, { none: true });
+  let link = null; try { link = $app.findRecordsByFilter("place_links", "osm = {:o} && platform = 'tripadvisor'", "-w", 1, 0, { o: osm })[0]; } catch (x) {}
+  const m = link ? String(link.get("url")).match(/-d(\d+)-/) : null;
+  if (!m) return e.json(200, { none: true });
+  const id = m[1];
   let c; try { c = $app.findFirstRecordByFilter("ta_cache", "osm = {:o}", { o: osm }); } catch (x) { c = null; }
-  const age = c ? Date.now() - new Date(String(c.get("updated")).replace(" ", "T")).getTime() : 1e15;
-  const out = (r) => e.json(200, r && r.get("ta") ? { rating: r.get("rating"), n: r.get("n"), url: r.get("url"), img: r.get("img") } : { none: true });
-  if (c && c.get("ta") && age < FRESH && !q.get("device")) return out(c);
+  if (!c) { c = new Record($app.findCollectionByNameOrId("ta_cache")); c.set("osm", osm); }
   try {
-    if (!c) { c = new Record($app.findCollectionByNameOrId("ta_cache")); c.set("osm", osm); }
-    let id = c.get("ta");
-    if (!id) {
-      // TripAdvisor bills every listing a response returns: a search returns up to 10, so we never search.
-      // The listing comes from the TripAdvisor link members or the restaurant added to the venue (…-d123456-…).
-      let link = null; try { link = $app.findRecordsByFilter("place_links", "osm = {:o} && platform = 'tripadvisor'", "-w", 1, 0, { o: osm })[0]; } catch (x) {}
-      const m = link ? String(link.get("url")).match(/-d(\d+)-/) : null;
-      if (!m) { if (c.id) return out(null); return e.json(200, { none: true }); }
-      id = m[1]; c.set("ta", id);
+    if (c.get("ta") !== id || !c.get("al")) { // put the listing on our allowlist (free), once
+      call("POST", "allowlist", key, { allowlist: [parseInt(id, 10)], operation_type: "APPEND" });
+      c.set("ta", id); c.set("al", true); $app.save(c);
     }
-    if (!spend(1)) { $app.save(c); return out(c.get("url") ? c : null); }
-    const d = get(API + id + "/details?key=" + key + "&language=" + lang + "&currency=EUR");
-    c.set("rating", parseFloat(d.rating || 0)); c.set("n", parseInt(d.num_reviews || 0, 10)); c.set("url", d.web_url || ""); c.set("img", d.rating_image_url || "");
-    $app.save(c);
-    return out(c);
+    if (!spend(1)) return e.json(200, { none: true, cap: true });
+    const d = call("GET", "locations/" + id + "?version=1&locale=" + (LOC[lang] || "en-US"), key);
+    const o = (d.traveler_ratings || {}).overall || {};
+    if (!o.rating) return e.json(200, { none: true });
+    e.response.header().set("Cache-Control", "no-store");
+    return e.json(200, { rating: o.rating, n: o.count || 0, img: o.icon_url || "", url: ((d.urls || {}).tripadvisor || {}).main || link.get("url") });
   } catch (x) {
-    if (U().isAdmin(String(q.get("device") || ""))) return e.json(200, { error: String(x).slice(0, 400) });
-    return out(c && c.get("url") ? c : null);
+    if (dbg) return e.json(200, { error: String(x).slice(0, 400) });
+    return e.json(200, { none: true });
   }
 }
 
