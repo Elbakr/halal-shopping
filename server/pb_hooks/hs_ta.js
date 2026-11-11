@@ -1,7 +1,7 @@
 // TripAdvisor rating of a venue (official Content API). The key stays on the server; the page only gets
 // the rating, the number of reviews, TripAdvisor's rating image and the link to the listing, to show with its logo.
-const LIMIT = 1000;        // calls per month (pay as you go, about $0.009 each: under $10 a month)
-const FRESH = 30 * 24 * 3600e3; // a rating is asked again after 30 days; a "no listing" answer after 90 days
+const LIMIT = 1600;        // listings per month: 1,000 free, then about $0.015 each (cap near $9)
+const FRESH = 30 * 24 * 3600e3; // a rating is asked again after 30 days
 const API = "https://api.content.tripadvisor.com/api/v1/location/";
 const U = () => require(`${__hooks}/hs_utils.js`);
 
@@ -17,8 +17,6 @@ function get(url) {
   if (res.statusCode !== 200) throw new Error("TripAdvisor " + res.statusCode);
   return res.json;
 }
-function norm(s) { return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((w) => w.length > 1 && ["restaurant", "the", "le", "la", "les", "de", "du", "chez", "snack"].indexOf(w) < 0); }
-function similar(a, b) { const x = norm(a), y = norm(b); if (!x.length || !y.length) return 0; let n = 0; x.forEach((w) => { if (y.indexOf(w) >= 0) n++; }); return n / Math.max(x.length, y.length); }
 
 function lookup(e) {
   const q = e.request.url.query();
@@ -35,12 +33,12 @@ function lookup(e) {
     if (!c) { c = new Record($app.findCollectionByNameOrId("ta_cache")); c.set("osm", osm); }
     let id = c.get("ta");
     if (!id) {
-      if (!spend(1)) return out(c.id ? c : null);
-      const s = get(API + "search?key=" + key + "&searchQuery=" + encodeURIComponent(name) + "&latLong=" + lat + "," + lon + "&category=restaurants&radius=0.3&radiusUnit=km&language=" + lang);
-      const best = (s.data || []).map((d) => ({ d: d, s: similar(name, d.name), km: parseFloat(d.distance || "9") })).filter((x) => x.s >= 0.5 && x.km <= 0.3)
-        .sort((a, b) => b.s - a.s || a.km - b.km)[0];
-      if (!best) { c.set("ta", ""); $app.save(c); return out(null); }
-      id = String(best.d.location_id); c.set("ta", id); c.set("name", best.d.name);
+      // TripAdvisor bills every listing a response returns: a search returns up to 10, so we never search.
+      // The listing comes from the TripAdvisor link members or the restaurant added to the venue (…-d123456-…).
+      let link = null; try { link = $app.findRecordsByFilter("place_links", "osm = {:o} && platform = 'tripadvisor'", "-w", 1, 0, { o: osm })[0]; } catch (x) {}
+      const m = link ? String(link.get("url")).match(/-d(\d+)-/) : null;
+      if (!m) { if (c.id) return out(null); return e.json(200, { none: true }); }
+      id = m[1]; c.set("ta", id);
     }
     if (!spend(1)) { $app.save(c); return out(c.get("url") ? c : null); }
     const d = get(API + id + "/details?key=" + key + "&language=" + lang + "&currency=EUR");
