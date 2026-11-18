@@ -1,6 +1,6 @@
 """Halal-declared shops and restaurants from OpenStreetMap, cut into 1-degree tiles the site loads instantly.
 Only what OpenStreetMap contributors declared (diet:halal / halal / butcher=halal). Nothing is invented."""
-import json, math, os, re, shutil, sys, time, urllib.parse, urllib.request
+import io, json, math, os, re, shutil, sys, time, urllib.parse, urllib.request
 HEADERS = {"User-Agent": "halal.shopping/1.0 (places builder)", "Accept": "text/tab-separated-values"}
 ENDPOINT = "https://qlever.dev/api/osm-planet"  # the whole OpenStreetMap planet, queried in seconds
 OUT = "data/places"
@@ -47,12 +47,20 @@ _ = [
 QUERIES = [(l, sparql(w)) for l, w in WHERES]
 ADMIN = {}  # "n123" -> {"8": "Schaerbeek", "2": "België / Belgique / Belgien", "iso": "BE"}
 
+def rows_of(req):
+    """Data rows of a TSV answer, read line by line: the whole answer is never held in memory three times
+    (bytes + text + list of lines), which brought the nightly run to 643 MB for a 650 MB cap on 18/11/2026."""
+    with urllib.request.urlopen(req, timeout=600) as r:
+        lines = io.TextIOWrapper(r, encoding="utf-8", newline="\n")
+        next(lines, None)  # header
+        for row in lines:
+            yield row.rstrip("\n")
+
 def fetch_admin(label, where):
     try:
         req = urllib.request.Request(ENDPOINT, data=urllib.parse.urlencode({"query": admin_sparql(where)}).encode(), headers=HEADERS)
-        rows = urllib.request.urlopen(req, timeout=600).read().decode("utf-8").split("\n")
         n = 0
-        for row in rows[1:]:
+        for row in rows_of(req):
             c = row.split("\t")
             if len(c) < 3: continue
             m = re.match(r"<https://www\.openstreetmap\.org/(node|way|relation)/(\d+)>", c[0])
@@ -90,9 +98,8 @@ def fetch(label, q):
     for attempt in range(4):
         try:
             req = urllib.request.Request(ENDPOINT, data=urllib.parse.urlencode({"query": q}).encode(), headers=HEADERS)
-            rows = urllib.request.urlopen(req, timeout=600).read().decode("utf-8").split("\n")
             els = []
-            for row in rows[1:]:
+            for row in rows_of(req):
                 c = row.split("\t")
                 if len(c) < 4 + len(COLS): continue
                 m = re.match(r"<https://www\.openstreetmap\.org/(node|way|relation)/(\d+)>", c[0])

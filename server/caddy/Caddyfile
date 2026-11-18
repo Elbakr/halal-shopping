@@ -7,6 +7,13 @@ api.halal.shopping {
 		root * /var/www/status
 		file_server
 	}
+	# Porte, robot de nuit et registre des tâches (lecture seule, aucun secret ni donnée de visiteur)
+	handle /_etat/* {
+		uri strip_prefix /_etat
+		root * /var/www/status/etat
+		header Cache-Control "no-cache"
+		file_server browse
+	}
 	# Places regenerated every night on this machine (see server/gen.sh), read by https://halal.shopping
 	handle /data/* {
 		root * /var/www

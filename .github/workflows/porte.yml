@@ -1,0 +1,122 @@
+# PORTE du site (build by Uxlab.ai)
+# Toute nouvelle version du site se pousse sur la branche « proposition ».
+#  AVANT : la version proposée est servie ici et passe le test zéro (2 téléphones, 4G ralentie, lecture seule).
+#          Rouge nouveau (cliquet tests/zero/rouges-connus.json) = refusée, main n'est pas touchée.
+#  Vert  : fusion dans main, attente de la mise en ligne GitHub Pages, puis test zéro sur halal.shopping.
+#  APRÈS : rouge = retour automatique à la version précédente (git revert poussé sur main).
+# Un envoi direct sur main (contournement) passe quand même par l'étape APRÈS.
+# Chaque verdict est publié sur la branche « porte » (site.json) ; le serveur le verse dans le registre.
+name: Porte
+on:
+  push:
+    branches: [proposition, main]
+    paths-ignore: ["data/**", "server/**", "tests/**", "scripts/**", "**.md"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: { group: porte, cancel-in-progress: false }
+jobs:
+  porte:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NODE_PATH: /tmp/pw/node_modules
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Outils (Playwright + Chromium)
+        run: |
+          mkdir -p /tmp/pw && cd /tmp/pw && npm init -y >/dev/null && npm i playwright@1.49.1 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Publier un verdict (fonction)
+        run: |
+          cat > /tmp/publier.sh <<'SH'
+          #!/bin/bash
+          # publier.sh <etape> <code> <verdict.json> : pousse site.json sur la branche « porte »
+          set -e; d=$(mktemp -d); cd "$d"; git init -q; git checkout -q -b porte
+          python3 - "$1" "$2" "$3" > site.json <<'PY'
+          import json, sys, os, datetime
+          etape, code, f = sys.argv[1:4]
+          try: v = json.load(open(f))
+          except Exception: v = {}
+          v.update({"etape": etape, "code": int(code), "sha": os.environ.get("SHA", ""), "heure": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "run": os.environ.get("RUN", "")})
+          print(json.dumps(v, ensure_ascii=False, indent=1))
+          PY
+          git add site.json; git -c user.name=porte -c user.email=actions@users.noreply.github.com commit -qm "Porte : $1 $2"
+          git push -qf "https://x-access-token:${TOKEN}@github.com/${REPO}.git" porte
+          SH
+          chmod +x /tmp/publier.sh
+      - name: Test de référence (celui de main, pas celui de la proposition)
+        run: |
+          git fetch -q origin main; mkdir -p /tmp/ref
+          git archive origin/main tests/zero | tar -x -C /tmp/ref
+          [ -f /tmp/ref/tests/zero/porte.sh ] || { rm -rf /tmp/ref/tests; cp -r tests /tmp/ref/; }
+          cp tests/zero/rouges-connus.json /tmp/ref/rc.json 2>/dev/null || echo '[]' > /tmp/ref/rc.json
+      - name: AVANT — la version proposée, servie localement
+        if: github.ref == 'refs/heads/proposition'
+        env: { SHA: "${{ github.sha }}", RUN: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", TOKEN: "${{ github.token }}", REPO: "${{ github.repository }}" }
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 >/dev/null 2>&1 &
+          sleep 1
+          set +e; SITE=http://127.0.0.1:8080/ RATCHET=/tmp/ref/rc.json /tmp/ref/tests/zero/porte.sh /tmp/avant; c=$?; set -e
+          tail -3 /tmp/avant/1.log
+          /tmp/publier.sh avant $c /tmp/avant/porte.json
+          [ $c = 2 ] && { echo "::warning::Porte non valable (API malade) : rien n'est appliqué, renvoyer plus tard."; exit 1; }
+          [ $c != 0 ] && { echo "::error::PORTE FERMÉE : version refusée, main inchangée."; cat /tmp/avant/porte.json; exit 1; }
+          echo "Porte ouverte."
+      - name: Fusion dans main
+        if: github.ref == 'refs/heads/proposition'
+        run: |
+          git config user.name "porte"; git config user.email "actions@users.noreply.github.com"
+          git fetch -q origin main; echo "PREV=$(git rev-parse origin/main)" >> $GITHUB_ENV
+          git checkout -q -B main origin/main
+          git merge --ff-only -q "$GITHUB_SHA" || git merge --no-edit -q -m "Porte : fusion de la proposition ${GITHUB_SHA::7}" "$GITHUB_SHA"
+          git push -q origin main
+          echo "NEW=$(git rev-parse HEAD)" >> $GITHUB_ENV
+      - name: Version précédente (envoi direct sur main)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "PREV=${{ github.event.before }}" >> $GITHUB_ENV; echo "NEW=$GITHUB_SHA" >> $GITHUB_ENV
+      - name: Attente de la mise en ligne
+        run: |
+          want=$(sha256sum index.html | cut -c1-64)
+          for i in $(seq 1 60); do
+            a=$(curl -s "https://halal.shopping/index.html?porte=$NEW-$i" | sha256sum | cut -c1-64)
+            b=$(curl -s "https://halal.shopping/?lang=fr" | sha256sum | cut -c1-64)
+            [ "$a" = "$want" ] && [ "$b" = "$want" ] && { echo "En ligne après $((i*15)) s"; exit 0; }
+            sleep 15
+          done
+          echo "::warning::Pas encore en ligne après 15 min : test sur ce qui est servi."
+      - name: APRÈS — halal.shopping en ligne
+        env: { SHA: "${{ github.sha }}", RUN: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", TOKEN: "${{ github.token }}", REPO: "${{ github.repository }}" }
+        run: |
+          cp tests/zero/rouges-connus.json /tmp/rc.json
+          set +e; SERRER=1 RATCHET=/tmp/rc.json /tmp/ref/tests/zero/porte.sh /tmp/apres; c=$?; set -e
+          tail -3 /tmp/apres/1.log
+          git config user.name "porte"; git config user.email "actions@users.noreply.github.com"
+          git fetch -q origin main; git checkout -q -f -B main origin/main
+          if [ $c = 1 ] && [ -n "$PREV" ] && [ "$PREV" != "0000000000000000000000000000000000000000" ]; then
+            for f in $(git diff --name-only "$PREV" "$NEW" -- . ':(exclude)data'); do
+              if git cat-file -e "$PREV:$f" 2>/dev/null; then git checkout -q "$PREV" -- "$f"; else git rm -q --ignore-unmatch "$f"; fi
+            done
+            git commit -qm "Porte : retour automatique à ${PREV::7} (rouge en ligne après ${NEW::7})" && git push -q origin main
+            /tmp/publier.sh retour 1 /tmp/apres/porte.json
+            echo "::error::ROUGE EN LIGNE : retour automatique à ${PREV::7}."; exit 1
+          fi
+          /tmp/publier.sh apres $c /tmp/apres/porte.json
+          if [ $c = 0 ] && ! cmp -s /tmp/rc.json tests/zero/rouges-connus.json; then  # cliquet resserré : les rouges guéris sortent de la liste
+            cp /tmp/rc.json tests/zero/rouges-connus.json; git commit -qam "Porte : cliquet resserré" && git push -q origin main
+          fi
+          [ $c = 0 ] || exit 1
+      - name: Captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: porte
+          retention-days: 14
+          if-no-files-found: ignore
+          path: |
+            /tmp/avant
+            /tmp/apres

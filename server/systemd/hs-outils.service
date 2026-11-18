@@ -1,0 +1,9 @@
+[Unit]
+Description=halal.shopping outils de la porte (Node, Playwright, Chromium)
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/hs/repo/server/porte/outils.sh
+StandardOutput=append:/var/log/hs-outils.log
+StandardError=append:/var/log/hs-outils.log

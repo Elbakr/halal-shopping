@@ -1,16 +1,25 @@
 // TEST ZÉRO — parcours en lecture seule sur le site EN LIGNE (halal.shopping), sans session.
 // Toute requête d'écriture (POST/PATCH/PUT/DELETE) vers l'API est bloquée et comptée : aucune contribution réelle possible.
 // Usage : node test_zero.js <dossier de sortie>
+// Variables : SITE (défaut https://halal.shopping/) ; API (défaut https://api.halal.shopping) : les appels du site vers
+// api.halal.shopping sont redirigés vers cette adresse (serveur d'essai de la porte), en lecture seule.
+// Code de sortie : 0 tout vert, 1 au moins un rouge (la porte applique ensuite le cliquet des rouges connus, voir porte.js).
 const { chromium, devices } = require('playwright'); const fs = require('fs'); const path = require('path');
 const OUT = process.argv[2] || '.'; fs.mkdirSync(OUT, { recursive: true });
-const SITE = 'https://halal.shopping/';
+const SITE = (process.env.SITE || 'https://halal.shopping/').replace(/\/?$/, '/');
+const API = (process.env.API || 'https://api.halal.shopping').replace(/\/$/, '');
+const PROD_API = 'https://api.halal.shopping';
 const PROFILES = { 'iphone13': devices['iPhone 13'], 'android': devices['Pixel 7'] };
 const results = [];
 async function run(pname, dev) {
   const b = await chromium.launch();
   const ctx = await b.newContext({ ...dev, locale: 'fr-BE', geolocation: { latitude: 50.8466, longitude: 4.3528 }, permissions: ['geolocation'] });
   let blockedWrites = [];
-  await ctx.route(/https:\/\/api\.halal\.shopping\//, r => { const m = r.request().method(); if (m !== 'GET' && m !== 'HEAD' && m !== 'OPTIONS') { blockedWrites.push(m + ' ' + r.request().url()); return r.abort(); } return r.continue(); });
+  await ctx.route(/https:\/\/api\.halal\.shopping\//, r => { const m = r.request().method(), u = r.request().url();
+    if (m !== 'GET' && m !== 'HEAD' && m !== 'OPTIONS') { if (!/\/api\/hs\/hit$/.test(u)) blockedWrites.push(m + ' ' + u); return r.abort(); }
+    // Fichiers servis par Caddy (/data/) : toujours ceux de la production. Le reste : serveur d'essai.
+    if (API !== PROD_API && !/^\/data\//.test(u.slice(PROD_API.length))) return r.fetch({ url: API + u.slice(PROD_API.length), timeout: 30000 }).then(x => r.fulfill({ response: x })).catch(() => r.abort());
+    return r.continue(); });
   const p = await ctx.newPage();
   const cdp = await ctx.newCDPSession(p);
   await cdp.send('Network.enable'); await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 1.6e6 / 8, uploadThroughput: 750e3 / 8 }); // 4G ralentie
@@ -53,8 +62,7 @@ async function run(pname, dev) {
   await b.close();
 }
 async function bots() { // pages de partage vues par les robots (aperçus WhatsApp, Google)
-  const https = require('https');
-  const get = (u, ua) => new Promise(res => { const t = Date.now(); https.get(u, { headers: { 'User-Agent': ua } }, r => { let d = ''; r.on('data', c => d += c); r.on('end', () => res({ s: r.statusCode, d, ms: Date.now() - t, loc: r.headers.location })); }).on('error', e => res({ s: 0, d: String(e), ms: 0 })); });
+  const get = (u, ua) => new Promise(res => { const t = Date.now(); if (!/\/sitemap/.test(u)) u = API + u.slice(PROD_API.length); (u.startsWith('https') ? require('https') : require('http')).get(u, { headers: { 'User-Agent': ua } }, r => { let d = ''; r.on('data', c => d += c); r.on('end', () => res({ s: r.statusCode, d, ms: Date.now() - t, loc: r.headers.location })); }).on('error', e => res({ s: 0, d: String(e), ms: 0 })); });
   for (const [n, u, want] of [['partage_lieu', 'https://api.halal.shopping/l/n2333276696', /<title>/], ['partage_produit', 'https://api.halal.shopping/p/3017620422003', /est-il halal/], ['partage_video', 'https://api.halal.shopping/a/e441', /Gélatine/], ['robots', 'https://api.halal.shopping/robots.txt', /Sitemap/], ['sitemap', 'https://api.halal.shopping/sitemap.xml', /sitemapindex/]]) {
     const r = await get(u, 'WhatsApp/2.23'); const ok = r.s === 200 && want.test(r.d); results.push({ profil: 'robot', ecran: n, vert: ok, ms: r.ms, note: r.s + ' ' + ((r.d.match(/<title>([^<]*)/) || [])[1] || r.d.slice(0, 60)).replace(/\s+/g, ' '), erreurs: [], echecs: ok ? [] : [r.s + ' ' + u], capture: '' });
   }
@@ -63,4 +71,4 @@ async function bots() { // pages de partage vues par les robots (aperçus WhatsA
 (async () => { const T = Date.now(); for (const [n, d] of Object.entries(PROFILES)) await run(n, d); await bots();
   fs.writeFileSync(path.join(OUT, 'resultats.json'), JSON.stringify(results, null, 1));
   for (const r of results) console.log((r.vert ? 'VERT ' : 'ROUGE') + ' | ' + r.profil + ' | ' + r.ecran + ' | ' + r.ms + ' ms | ' + r.note + (r.erreurs.length ? ' | console: ' + r.erreurs.join(' ; ') : '') + (r.echecs.length ? ' | échecs: ' + r.echecs.join(' ; ') : ''));
-  console.log('Durée totale : ' + Math.round((Date.now() - T) / 1000) + ' s'); })();
+  console.log('Durée totale : ' + Math.round((Date.now() - T) / 1000) + ' s'); process.exit(results.every(r => r.vert) ? 0 : 1); })().catch(e => { console.log('ROUGE | test | plantage | 0 ms | ' + e.message); process.exit(1); });

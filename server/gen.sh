@@ -2,6 +2,7 @@
 # Every night: regenerate the halal places from OpenStreetMap and official address registers,
 # then publish them at https://api.halal.shopping/data/ . The previous files stay online if anything fails.
 set -u
+exec 9>/run/hs-lourd.lock; flock -w 3600 9   # jamais en même temps que la porte ou le robot (mémoire)
 W=/opt/hs/gen; OUT=/var/www/data; ST=/var/www/status/places.txt
 mkdir -p "$W/scripts" "$W/data" "$OUT"
 rsync -a --delete /opt/hs/repo/scripts/ "$W/scripts/"

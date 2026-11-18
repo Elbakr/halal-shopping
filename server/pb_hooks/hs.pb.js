@@ -36,3 +36,8 @@ routerAdd("GET", "/api/hs/search", (e) => require(`${__hooks}/hs_search.js`).sea
 routerAdd("GET", "/api/hs/ta", (e) => require(`${__hooks}/hs_ta.js`).lookup(e));
 routerAdd("POST", "/api/hs/admin/secret", (e) => require(`${__hooks}/hs_ta.js`).setSecret(e));
 routerAdd("GET", "/api/hs/admin/secrets", (e) => require(`${__hooks}/hs_ta.js`).secrets(e));
+
+// Audience without cookies (visitors, searches, contributions per day). See hs_aud.js.
+routerAdd("POST", "/api/hs/hit", (e) => require(`${__hooks}/hs_aud.js`).hit(e));
+routerAdd("GET", "/api/hs/audience", (e) => require(`${__hooks}/hs_aud.js`).list(e));
+cronAdd("hs_aud_nightly", "20 0 * * *", () => require(`${__hooks}/hs_aud.js`).nightly());

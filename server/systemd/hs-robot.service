@@ -1,0 +1,9 @@
+[Unit]
+Description=halal.shopping robot universel de nuit (lecture seule)
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/hs/accepte/server/robot/robot.sh
+Nice=10
+MemoryMax=600M

@@ -6,4 +6,9 @@ After=network-online.target
 Type=oneshot
 ExecStart=/opt/hs/gen.sh
 Nice=10
-MemoryMax=650M
+# 18/11 : pointe à 643 Mo pour un plafond de 650 Mo. Les réponses sont maintenant lues ligne à ligne (places.py) ;
+# au-delà de 600 Mo le noyau récupère la mémoire au lieu de tuer, plafond dur 800 Mo, et en cas de manque
+# c'est cette tâche qui cède, jamais l'API (OOMScoreAdjust).
+MemoryHigh=600M
+MemoryMax=800M
+OOMScoreAdjust=600

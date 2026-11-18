@@ -668,6 +668,10 @@ function render(p,r){
 }
 
 var HSAPI="https://api.halal.shopping", HSAPI_OK=false;
+// Audience without cookies or browser storage: one signal per page view and per search, never under automation. See server/pb_hooks/hs_aud.js.
+function hsHit(e){ try{ if(navigator.webdriver||/bot|crawl|spider|headless|preview|lighthouse/i.test(navigator.userAgent))return;
+  fetch(HSAPI+"/api/hs/hit",{method:"POST",headers:{"Content-Type":"application/json"},body:'{"e":"'+e+'"}',keepalive:true,credentials:"omit"}).catch(function(){}) }catch(x){} }
+setTimeout(function(){hsHit("v")},1200);
 var curCode=null, pendingKind="logo";
 var CAM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
 // Administrator link: https://halal.shopping/#k=<key>. The key becomes this browser's contributor id; only its hash is on the server.
@@ -1109,7 +1113,7 @@ $("cam").addEventListener("click",function(){
     stream=s; var v=$("v"); v.setAttribute("playsinline",""); v.muted=true; v.srcObject=s; v.hidden=false; var pl=v.play(); if(pl&&pl.catch)pl.catch(function(){}); msg(t("camhint"));
     return dp.then(function(d){ var busy=false;
       (function loop(){ if(!stream)return; if(busy||v.readyState<2){setTimeout(loop,120);return} busy=true;
-        d.detect(v).then(function(c){busy=false; var code=c&&c[0]&&c[0].rawValue; if(code){stopCam();lookup(code)} else setTimeout(loop,150)}).catch(function(){busy=false;setTimeout(loop,300)}) })();
+        d.detect(v).then(function(c){busy=false; var code=c&&c[0]&&c[0].rawValue; if(code){stopCam();hsHit("s");lookup(code)} else setTimeout(loop,150)}).catch(function(){busy=false;setTimeout(loop,300)}) })();
     });
   }).catch(function(){stopCam();msg(t("nocam"))});
 });
@@ -1117,11 +1121,11 @@ function stopCam(){ if(stream){stream.getTracks().forEach(function(x){x.stop()})
 $("photo").addEventListener("change",function(e){
   var f=e.target.files&&e.target.files[0]; if(!f)return; e.target.value=""; msg(t("loading"));
   getDetector().then(function(d){return (window.createImageBitmap?createImageBitmap(f).catch(function(){return f}):Promise.resolve(f)).then(function(b){return d.detect(b)})})
-    .then(function(c){ if(c&&c[0]&&c[0].rawValue)lookup(c[0].rawValue); else msg(t("nobar")) }).catch(function(){msg(t("nobar"))});
+    .then(function(c){ if(c&&c[0]&&c[0].rawValue){hsHit("s");lookup(c[0].rawValue)} else msg(t("nobar")) }).catch(function(){msg(t("nobar"))});
 });
 
 // ---------- Wiring ----------
-$("f").addEventListener("submit",function(e){e.preventDefault();lookup($("q").value)});
+$("f").addEventListener("submit",function(e){e.preventDefault();hsHit("s");lookup($("q").value)});
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-code]"); if(b){lookup(b.dataset.code);return}
   var s=e.target.closest("[data-shelf]"); if(s){loadShelf(s.dataset.shelf);return}
