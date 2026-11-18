@@ -59,7 +59,7 @@ function place(e) {
   return page(e, { title: title, h1: r.n, desc: desc, self: "https://api.halal.shopping/l/" + id, go: go, body: body, ld: ld });
 }
 
-function product(e) {
+function product(e) { throw new Error("ESSAI VOLONTAIREMENT CASSE");
   var code = e.request.pathValue("code") || "";
   if (!/^\d{8,14}$/.test(code)) return e.redirect(302, SITE);
   var go = SITE + "#p" + code;
