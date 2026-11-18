@@ -1,0 +1,12 @@
+const { chromium, devices } = require('playwright');
+(async()=>{ const b=await chromium.launch();
+  const ctx=await b.newContext({...devices['iPhone 13'],locale:'fr-FR'});
+  const p=await ctx.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
+  p.on('request',r=>{if(r.url().includes('place_links')&&r.method()==='POST')console.log('POST envoyé',r.postData())});
+  p.on('response',async r=>{if(r.url().includes('place_links/records')&&r.request().method()==='POST')console.log('réponse',r.status(),(await r.text()).slice(0,120))});
+  await p.goto('http://localhost:8769/?lang=fr#ln1113153776',{waitUntil:'domcontentloaded'}); await p.waitForTimeout(5000);
+  await p.click('#lkOpen'); console.log('formulaire visible:',await p.isVisible('#lkF'));
+  await p.selectOption('#lkP','ubereats'); await p.fill('#lkU','ubereats.com/be/store/pyramide/abc'); await p.click('#lkF button[type=submit]'); await p.waitForTimeout(4000);
+  console.log('toasts:',await p.evaluate(()=>[...document.querySelectorAll('.toast,#toast')].map(x=>x.innerText).join('|')), '| url:', p.url().slice(-40));
+  console.log('liens:',await p.evaluate(()=>[...document.querySelectorAll('#ppb .see a')].map(a=>a.innerText)), errs);
+  await b.close(); })().catch(e=>{console.log('ERR',String(e).slice(0,300));process.exit(1)});

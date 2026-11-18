@@ -1,0 +1,18 @@
+const { chromium, devices } = require('playwright');
+(async()=>{ const b=await chromium.launch(); const ctx=await b.newContext({...devices['iPhone 13'],locale:'fr-FR'});
+  const p=await ctx.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
+  await p.goto('https://halal.shopping/?lang=fr&v=90',{waitUntil:'domcontentloaded'}); await p.waitForTimeout(2500);
+  console.log('boutons vidéo (pièges + guide):',await p.evaluate(()=>document.querySelectorAll('[data-vid]').length));
+  console.log('invitation:',await p.evaluate(()=>document.querySelector('.invite').innerText.replace(/\n+/g,' | ')),'→',decodeURIComponent(await p.getAttribute('#inv','href')).slice(0,140));
+  await p.click('#traps [data-vid="e120"]'); await p.waitForTimeout(1500);
+  console.log('E120:',await p.evaluate(()=>document.querySelector('#vmb iframe').src),'| hash',await p.evaluate(()=>location.hash));
+  await p.click('#vmb [data-vi="0"]'); await p.waitForTimeout(500); console.log('source 0:',await p.evaluate(()=>document.querySelector('#vmb iframe').src.split('/embed/')[1].slice(0,11)));
+  console.log('WhatsApp:',decodeURIComponent(await p.evaluate(()=>document.querySelector('#vmb .wa').href)).slice(0,160));
+  await p.screenshot({path:'vid.png'});
+  await p.click('#vmx'); await p.waitForTimeout(300); console.log('fermé:',await p.evaluate(()=>document.getElementById('vm').hidden+' '+location.hash));
+  const p2=await ctx.newPage(); await p2.goto('https://halal.shopping/?lang=en&v=90#a=e441',{waitUntil:'domcontentloaded'}); await p2.waitForTimeout(2500);
+  console.log('lien direct E441 (anglais):',await p2.evaluate(()=>document.getElementById('vm').hidden?'fermé':document.querySelector('#vmb h2').innerText+' / '+document.querySelector('#vmb .vw').innerText));
+  const p3=await ctx.newPage(); await p3.goto('https://halal.shopping/?lang=fr&v=90#p3017620422003',{waitUntil:'domcontentloaded'}); await p3.waitForTimeout(6000);
+  console.log('produit WhatsApp:',decodeURIComponent(await p3.evaluate(()=>{var a=document.getElementById('waP');return a?a.href:'absent'})).slice(0,140));
+  console.log('débordement:',await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth), errs);
+  await b.close(); })().catch(e=>{console.log('ERR',String(e).slice(0,300));process.exit(1)});

@@ -1,0 +1,24 @@
+const { chromium, devices } = require('playwright');
+const D='/tmp/claude-0/-home-claude/b1e999ef-e600-5291-9431-c0f0a5755a1b/scratchpad/';
+(async()=>{ const b=await chromium.launch();
+  const ctx=await b.newContext({...devices['iPhone 13'],locale:'fr-FR',geolocation:{latitude:50.8605,longitude:4.3606},permissions:['geolocation']});
+  const p=await ctx.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
+  await p.goto('https://halal.shopping/?lang=fr&v=80',{waitUntil:'domcontentloaded'}); await p.waitForTimeout(2500); await p.click('#near'); await p.waitForTimeout(5000);
+  await p.click('#plist .pl:first-child .pln'); await p.waitForTimeout(3500);
+  const id=await p.evaluate(()=>location.hash.slice(2)); console.log('fiche',id,await p.evaluate(()=>document.querySelector('#ppb h2').innerText));
+  console.log('liens avant:',await p.evaluate(()=>[...document.querySelectorAll('#ppb .see a')].map(a=>a.innerText)));
+  await p.click('#phOpen'); const [fc]=await Promise.all([p.waitForEvent('filechooser'),p.click('[data-phk="menu"]')]); await fc.setFiles(D+'ean.png'); await p.waitForTimeout(6000);
+  console.log('photos:',await p.evaluate(()=>[...document.querySelectorAll('#ppb .ph figcaption')].map(x=>x.innerText.replace(/\n/g,' '))), '| vignette chargée:', await p.evaluate(()=>{var i=document.querySelector('#ppb .ph img');return i?i.naturalWidth:0}));
+  await p.click('#lkOpen'); await p.selectOption('#lkP','ubereats'); await p.fill('#lkU','ubereats.com/be/store/pyramide/abc'); await p.click('#lkF button[type=submit]'); await p.waitForTimeout(3500);
+  console.log('liens après:',await p.evaluate(()=>[...document.querySelectorAll('#ppb .see a')].map(a=>a.innerText+' → '+a.href.slice(0,60))));
+  await p.evaluate(()=>{document.getElementById('lkF').hidden=false}); await p.selectOption('#lkP','deliveroo'); await p.fill('#lkU','https://example.com/x'); await p.click('#lkF button[type=submit]'); await p.waitForTimeout(2500);
+  console.log('lien faux, message:',await p.evaluate(()=>[...document.querySelectorAll('.toast,#toast')].map(x=>x.innerText).join('|')));
+  await p.click('#ppb [data-flag]'); await p.waitForTimeout(2500); console.log('signalé, photo encore visible (1 signalement ne suffit pas):',await p.evaluate(()=>document.querySelectorAll('#ppb .ph').length));
+  await p.evaluate(()=>document.querySelector('#ppb .phg').scrollIntoView({block:'center'})); await p.screenshot({path:'proof.png'});
+  console.log('débordement:',await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth), errs);
+  // nettoyage avec le même identifiant de membre
+  const r=await p.evaluate(async(id)=>{const A="https://api.halal.shopping/api",dev=localStorage.getItem("hs_dev"),H={"Content-Type":"application/json"};
+    const m=(await (await fetch(A+"/collections/place_media/records?filter="+encodeURIComponent("(osm='"+id+"')"))).json()).items||[];let n=0;
+    const w=async(b)=>{const r=await fetch(A+"/hs/withdraw",{method:"POST",headers:H,body:JSON.stringify(Object.assign({device:dev},b))});n+=(await r.json()).removed||0};
+    for(const x of m){await w({coll:"media_flags",key:x.id});await w({coll:"place_media",key:x.id})} await w({coll:"place_links",key:id,kind:"ubereats"}); return n},id);
+  console.log('nettoyé:',r); await b.close(); })().catch(e=>{console.log('ERR',String(e).slice(0,400));process.exit(1)});
