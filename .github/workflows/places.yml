@@ -4,6 +4,7 @@ on:
     - cron: "43 2 * * *"
   workflow_dispatch:
   push:
+    branches: [main]
     paths: ["scripts/places.py", "scripts/enrich.py", ".github/workflows/places.yml"]
 permissions:
   contents: write
