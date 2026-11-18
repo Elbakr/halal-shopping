@@ -1,0 +1,286 @@
+[
+ {
+  "profil": "iphone13",
+  "ecran": "accueil",
+  "vert": true,
+  "ms": 2681,
+  "note": "champ visible en 674 ms ; 443 éléments cliquables",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "iphone13-accueil.png"
+ },
+ {
+  "profil": "iphone13",
+  "ecran": "autour_de_moi",
+  "vert": true,
+  "ms": 24,
+  "note": "60 lieux ; premier : L'Express",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "iphone13-autour_de_moi.png"
+ },
+ {
+  "profil": "iphone13",
+  "ecran": "filtres",
+  "vert": true,
+  "ms": 2215,
+  "note": "filtres : all,t_rest,t_fast,t_butcher,t_shop,todo,chain,open,deliv,alc",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "iphone13-filtres.png"
+ },
+ {
+  "profil": "iphone13",
+  "ecran": "fiche_lieu",
+  "vert": true,
+  "ms": 3231,
+  "note": "L'Express → Athenes ; ‹1 / 60› ; réservation : oui",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "iphone13-fiche_lieu.png"
+ },
+ {
+  "profil": "iphone13",
+  "ecran": "recherche_nom",
+  "vert": true,
+  "ms": 316,
+  "note": "14 x Mars Minis | Mars | Mars",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "iphone13-recherche_nom.png"
+ },
+ {
+  "profil": "iphone13",
+  "ecran": "fiche_produit_resultats",
+  "vert": true,
+  "ms": 6554,
+  "note": "‹1 / 24› → ‹2 / 24› ; liste revue (24) ; effacée",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "iphone13-fiche_produit_resultats.png"
+ },
+ {
+  "profil": "iphone13",
+  "ecran": "produit_code_barres",
+  "vert": true,
+  "ms": 807,
+  "note": "Nutella : Aucune mention halalAucun ingrédient à risque trouvé, mais l ; affiché en 801 ms",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "iphone13-produit_code_barres.png"
+ },
+ {
+  "profil": "iphone13",
+  "ecran": "video_additif",
+  "vert": true,
+  "ms": 35,
+  "note": "vidéo Io99A2vLcT4 ; bouton WhatsApp présent",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "iphone13-video_additif.png"
+ },
+ {
+  "profil": "iphone13",
+  "ecran": "langue_ar",
+  "vert": true,
+  "ms": 3240,
+  "note": "dir=rtl ; حلال أم لا؟امسح. الجواب في ثانيتين.",
+  "erreurs": [],
+  "echecs": [
+   "net::ERR_ABORTED https://www.youtube-nocookie.com/embed/Io99A2vLcT4?rel=0&playsinline=1&modestbranding=1&hl=fr"
+  ],
+  "capture": "iphone13-langue_ar.png"
+ },
+ {
+  "profil": "iphone13",
+  "ecran": "organisme_formulaire",
+  "vert": true,
+  "ms": 1641,
+  "note": "9 champs ; fermé sans envoi",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "iphone13-organisme_formulaire.png"
+ },
+ {
+  "profil": "iphone13",
+  "ecran": "(écritures bloquées)",
+  "vert": true,
+  "ms": 0,
+  "note": "0 tentative(s) d'écriture bloquée(s)",
+  "erreurs": [],
+  "echecs": [],
+  "capture": ""
+ },
+ {
+  "profil": "android",
+  "ecran": "accueil",
+  "vert": true,
+  "ms": 2879,
+  "note": "champ visible en 873 ms ; 443 éléments cliquables",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "android-accueil.png"
+ },
+ {
+  "profil": "android",
+  "ecran": "autour_de_moi",
+  "vert": true,
+  "ms": 21,
+  "note": "60 lieux ; premier : L'Express",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "android-autour_de_moi.png"
+ },
+ {
+  "profil": "android",
+  "ecran": "filtres",
+  "vert": true,
+  "ms": 2210,
+  "note": "filtres : all,t_rest,t_fast,t_butcher,t_shop,todo,chain,open,deliv,alc",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "android-filtres.png"
+ },
+ {
+  "profil": "android",
+  "ecran": "fiche_lieu",
+  "vert": true,
+  "ms": 3226,
+  "note": "L'Express → Athenes ; ‹1 / 60› ; réservation : oui",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "android-fiche_lieu.png"
+ },
+ {
+  "profil": "android",
+  "ecran": "recherche_nom",
+  "vert": true,
+  "ms": 329,
+  "note": "14 x Mars Minis | Mars | Mars",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "android-recherche_nom.png"
+ },
+ {
+  "profil": "android",
+  "ecran": "fiche_produit_resultats",
+  "vert": true,
+  "ms": 6586,
+  "note": "‹1 / 24› → ‹2 / 24› ; liste revue (24) ; effacée",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "android-fiche_produit_resultats.png"
+ },
+ {
+  "profil": "android",
+  "ecran": "produit_code_barres",
+  "vert": true,
+  "ms": 821,
+  "note": "Nutella : Aucune mention halalAucun ingrédient à risque trouvé, mais l ; affiché en 814 ms",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "android-produit_code_barres.png"
+ },
+ {
+  "profil": "android",
+  "ecran": "video_additif",
+  "vert": true,
+  "ms": 37,
+  "note": "vidéo Io99A2vLcT4 ; bouton WhatsApp présent",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "android-video_additif.png"
+ },
+ {
+  "profil": "android",
+  "ecran": "langue_ar",
+  "vert": true,
+  "ms": 3181,
+  "note": "dir=rtl ; حلال أم لا؟امسح. الجواب في ثانيتين.",
+  "erreurs": [],
+  "echecs": [
+   "net::ERR_ABORTED https://www.youtube-nocookie.com/embed/Io99A2vLcT4?rel=0&playsinline=1&modestbranding=1&hl=fr"
+  ],
+  "capture": "android-langue_ar.png"
+ },
+ {
+  "profil": "android",
+  "ecran": "organisme_formulaire",
+  "vert": true,
+  "ms": 1625,
+  "note": "9 champs ; fermé sans envoi",
+  "erreurs": [],
+  "echecs": [],
+  "capture": "android-organisme_formulaire.png"
+ },
+ {
+  "profil": "android",
+  "ecran": "(écritures bloquées)",
+  "vert": true,
+  "ms": 0,
+  "note": "0 tentative(s) d'écriture bloquée(s)",
+  "erreurs": [],
+  "echecs": [],
+  "capture": ""
+ },
+ {
+  "profil": "robot",
+  "ecran": "partage_lieu",
+  "vert": true,
+  "ms": 509,
+  "note": "200 L'Express — Restaurant à Bruxelles - Brussel | halal.shopping",
+  "erreurs": [],
+  "echecs": [],
+  "capture": ""
+ },
+ {
+  "profil": "robot",
+  "ecran": "partage_produit",
+  "vert": true,
+  "ms": 138,
+  "note": "200 Nutella (Ferrero) est-il halal ? | halal.shopping",
+  "erreurs": [],
+  "echecs": [],
+  "capture": ""
+ },
+ {
+  "profil": "robot",
+  "ecran": "partage_video",
+  "vert": true,
+  "ms": 107,
+  "note": "200 Gélatine E441 : fabriquée à partir de peaux et d'os | halal.shopping",
+  "erreurs": [],
+  "echecs": [],
+  "capture": ""
+ },
+ {
+  "profil": "robot",
+  "ecran": "robots",
+  "vert": true,
+  "ms": 106,
+  "note": "200 User-agent: * Allow: /l/ Allow: /p/ Allow: /a/ Disallow: /ap",
+  "erreurs": [],
+  "echecs": [],
+  "capture": ""
+ },
+ {
+  "profil": "robot",
+  "ecran": "sitemap",
+  "vert": true,
+  "ms": 105,
+  "note": "200 <?xml version=\"1.0\" encoding=\"UTF-8\"?> <sitemapindex xmlns=\"",
+  "erreurs": [],
+  "echecs": [],
+  "capture": ""
+ },
+ {
+  "profil": "robot",
+  "ecran": "partage_humain_redirige",
+  "vert": true,
+  "ms": 106,
+  "note": "302 → https://halal.shopping/#ln2333276696",
+  "erreurs": [],
+  "echecs": [],
+  "capture": ""
+ }
+]
