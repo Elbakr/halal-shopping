@@ -2,9 +2,10 @@
 # tâche ouverte du registre, propose un correctif et l'envoie à la PORTE (branche « proposition »). Rien n'arrive en
 # ligne sans test zéro vert. Voir scripts/releve.py. État : branche « releve », fichier releve.json.
 name: Relève DeepSeek
+# 21/11 18 h 55 : minuterie retirée. DeepSeek tourne déjà dans l'usine (cerveau 88.99 : chantier automatique,
+# publieur ; usine-1/3 : ouvriers) avec sa propre clé et son budget suivi : pas de seconde clé ici. Ce fichier ne sert
+# plus que de modèle de branchement (registre public -> correctif -> branche proposition -> porte), lancé à la main.
 on:
-  schedule:
-    - cron: "41 */2 * * *"
   workflow_dispatch:
 permissions:
   contents: write
