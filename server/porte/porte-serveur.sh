@@ -22,7 +22,7 @@ if [ "$MODE" = avant ]; then
   for db in data auxiliary; do [ -f /opt/hs/pb/pb_data/$db.db ] && sqlite3 /opt/hs/pb/pb_data/$db.db ".backup '$E/pb_data/$db.db'"; done
   sqlite3 $E/pb_data/data.db "DELETE FROM hs_secrets;" 2>/dev/null   # aucune clé dans l'essai : pas d'appel payant, pas de fuite
   cp -r "$SRV/pb_hooks" $E/pb_hooks; cp -r "$SRV/pb_migrations" $E/pb_migrations; chown -R pb:pb $E
-  runuser -u pb -- /opt/hs/pb/pocketbase serve --dir $E/pb_data --hooksDir $E/pb_hooks --migrationsDir $E/pb_migrations --http 127.0.0.1:8091 > "$OUT/essai-pocketbase.log" 2>&1 &
+  runuser -u pb -- env HS_ESSAI=1 /opt/hs/pb/pocketbase serve --dir $E/pb_data --hooksDir $E/pb_hooks --migrationsDir $E/pb_migrations --http 127.0.0.1:8091 > "$OUT/essai-pocketbase.log" 2>&1 &
   PB=$!
   runuser -u hsrobot -- python3 -m http.server 8092 --bind 127.0.0.1 --directory "$SITE_DIR" > /dev/null 2>&1 &
   WS=$!

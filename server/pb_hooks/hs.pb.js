@@ -41,3 +41,12 @@ routerAdd("GET", "/api/hs/admin/secrets", (e) => require(`${__hooks}/hs_ta.js`).
 routerAdd("POST", "/api/hs/hit", (e) => require(`${__hooks}/hs_aud.js`).hit(e));
 routerAdd("GET", "/api/hs/audience", (e) => require(`${__hooks}/hs_aud.js`).list(e));
 cronAdd("hs_aud_nightly", "20 0 * * *", () => require(`${__hooks}/hs_aud.js`).nightly());
+
+// Entrées extérieures -> courriel au fondateur (règle du 21/11/2026). See hs_entrees.js.
+onRecordAfterCreateSuccess((e) => {
+  try { const E = require(`${__hooks}/hs_entrees.js`); if (E.enfiler(e.record, false)) E.passe(); } catch (x) { console.log("entrees:", x); }
+  e.next();
+}, "signals", "place_signals", "place_ratings", "added_places", "contributions", "place_media", "place_links", "media_flags", "orgs", "org_items");
+routerAdd("POST", "/api/hs/admin/entrees", (e) => require(`${__hooks}/hs_entrees.js`).admin(e));
+routerAdd("GET", "/api/hs/admin/entrees", (e) => require(`${__hooks}/hs_entrees.js`).admin(e));
+cronAdd("hs_entrees", "*/5 * * * *", () => { try { require(`${__hooks}/hs_entrees.js`).passe(); } catch (x) { console.log("entrees cron:", x); } });
