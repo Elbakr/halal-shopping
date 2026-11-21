@@ -1296,10 +1296,14 @@ var urlLang=(location.search.match(/[?&]lang=([a-z]{2})/)||[])[1];
 var chosen=store("hs_lang_choice");
 var first=(urlLang&&LANGS[urlLang])?urlLang:(chosen&&LANGS[chosen])?chosen:(browserLangs()[0]||"en");
 applyLang(first);
+// One IP lookup every 6 h at most (ipapi.co limits requests per address: a reload must not cost a call).
+function ipInfo(){ try{var c=JSON.parse(store("hs_ip")||"null"); if(c&&Date.now()-c.t<216e5)return Promise.resolve(c)}catch(e){}
+  return fetch("https://ipapi.co/json/").then(function(r){return r.ok?r.json():null}).then(function(j){ if(!j||!j.country_code)return null;
+    var c={t:Date.now(),cc:j.country_code,lat:j.latitude,lon:j.longitude,city:j.city||""}; store("hs_ip",JSON.stringify(c)); return c }).catch(function(){return null}) }
 if(!urlLang&&!chosen){
   var geo=function(u,f){return Promise.race([fetch(u).then(function(r){if(!r.ok)throw 0;return r.json()}).then(f),new Promise(function(_,no){setTimeout(no,2500)})])};
   geo("https://api.country.is/",function(j){return j.country})
-   .catch(function(){return geo("https://ipapi.co/json/",function(j){return j.country_code})})
+   .catch(function(){return ipInfo().then(function(c){return c&&c.cc})})
    .then(function(c){ if(!c)return; c=String(c).toUpperCase(); var l=pickFor(c); if(l!==L)applyLang(l) }).catch(function(){});
 }
 loadShelf("candies");
@@ -1318,7 +1322,7 @@ $("addPhoto").addEventListener("change",function(){$("addPhotoL").textContent=(t
 // Position at opening: the phone's own position (GPS) first. The connection's approximate position (often a city
 // far away on mobile networks) is only a fallback, clearly labelled, and the GPS replaces it as soon as it arrives.
 (function(){ var got=false;
-  function ipLoc(){ if(PLSRC)return; fetch("https://ipapi.co/json/").then(function(r){return r.ok?r.json():null}).then(function(j){ if(j&&j.latitude&&!PLSRC){ PLSRC="ip"; $("city").value=""; loadPlaces(j.latitude,j.longitude); GEOMSG=t("geoApprox").replace("{x}",j.city||"") } }).catch(function(){}) }
+  function ipLoc(){ if(PLSRC)return; ipInfo().then(function(j){ if(j&&j.lat&&!PLSRC){ PLSRC="ip"; $("city").value=""; loadPlaces(j.lat,j.lon); GEOMSG=t("geoApprox").replace("{x}",j.city||"") } }).catch(function(){}) }
   function gps(){ navigator.geolocation.getCurrentPosition(function(g){ got=true; store("hs_gps","1"); if(PLSRC==="city")return; PLSRC="gps"; $("city").value=""; loadPlaces(g.coords.latitude,g.coords.longitude) },
     function(){ if(!got)ipLoc() },{timeout:12000,maximumAge:300000}) }
   if(!navigator.geolocation)return ipLoc();

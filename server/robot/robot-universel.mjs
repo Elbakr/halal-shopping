@@ -68,10 +68,15 @@ while (file.length && ecrans.length < +MAXE) {
   await p.screenshot({ path: `${OUT}/${n}.png` }).catch(() => {})
   const cliquables = m.elements.filter(e => (e.tag === 'button' || e.role === 'button' || e.role === 'tab' || e.tag === 'summary') && e.type !== 'submit' && !DANGER.test(e.nom))
   const clics = []
+  const occ = new Map()
   for (const e of cliquables.slice(0, +MAXC)) {
     const avant = err.length
+    // Le bouton est retrouvé par son NOM et son rang parmi les boutons du même nom : une page qui se remplit
+    // en arrière-plan (lieux, votes) ne décale plus la cible (halal.shopping, 21/11).
+    const k = occ.get(e.nom) || 0; occ.set(e.nom, k + 1)
+    const cible = e.nom ? p.locator(SEL).filter({ visible: true }).filter({ hasText: e.nom }).nth(k) : p.locator(SEL).filter({ visible: true }).nth(e.i)
     try {
-      await p.locator(SEL).filter({ visible: true }).nth(e.i).click({ timeout: 4000 })
+      await (await cible.count() ? cible : p.locator(SEL).filter({ visible: true }).nth(e.i)).click({ timeout: 4000 })
       await p.waitForTimeout(400)
       clics.push({ nom: e.nom || '(sans nom)', ok: err.length === avant })
     } catch (x) { clics.push({ nom: e.nom || '(sans nom)', ok: false, raison: 'ne repond pas : ' + x.message.split('\n')[0].slice(0, 70) }) }
