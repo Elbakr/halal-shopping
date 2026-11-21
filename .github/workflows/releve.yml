@@ -1,0 +1,44 @@
+# RELÈVE DeepSeek (build by Uxlab.ai) : quand la session Claude ne travaille plus, DeepSeek prend la plus ancienne
+# tâche ouverte du registre, propose un correctif et l'envoie à la PORTE (branche « proposition »). Rien n'arrive en
+# ligne sans test zéro vert. Voir scripts/releve.py. État : branche « releve », fichier releve.json.
+name: Relève DeepSeek
+on:
+  schedule:
+    - cron: "41 */2 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency: { group: porte, cancel-in-progress: false }
+jobs:
+  releve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main, fetch-depth: 50 }
+      - name: État précédent
+        run: |
+          git fetch -q origin releve 2>/dev/null && git show origin/releve:releve.json > /tmp/releve.json 2>/dev/null || echo '{"tentatives":{},"depense":{},"journal":[]}' > /tmp/releve.json
+      - name: DeepSeek propose un correctif
+        id: r
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          RELEVE_ETAT: /tmp/releve.json
+        run: python3 scripts/releve.py
+      - name: Envoi à la porte
+        if: steps.r.outputs.pousser == '1'
+        env: { GH_TOKEN: "${{ github.token }}", MSG: "${{ steps.r.outputs.message }}" }
+        run: |
+          git config user.name "releve"; git config user.email "actions@users.noreply.github.com"
+          git checkout -q -B proposition
+          git commit -qam "$MSG"
+          git push -q -f origin proposition
+          gh workflow run porte.yml --ref proposition
+      - name: Publier l'état de la relève
+        if: always()
+        env: { TOKEN: "${{ github.token }}", REPO: "${{ github.repository }}" }
+        run: |
+          d=$(mktemp -d); cp /tmp/releve.json "$d/"; cd "$d"; git init -q; git checkout -q -b releve
+          git add releve.json; git -c user.name=releve -c user.email=actions@users.noreply.github.com commit -qm "Relève : état"
+          git push -qf "https://x-access-token:${TOKEN}@github.com/${REPO}.git" releve

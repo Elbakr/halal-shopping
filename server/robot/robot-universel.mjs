@@ -35,7 +35,8 @@ await ctx.route('**/*', r => {
 })
 const p = await ctx.newPage()
 p.on('dialog', d => d.dismiss().catch(() => {}))
-const vus = new Set(), formes = new Map(), file = ['/'], ecrans = [], rouges = []
+// Écrans de départ (halal.shopping, 21/11) : une application d'une seule page n'a pas de liens à suivre ; ROBOT_DEPART="/?lang=fr,/?lang=ar" en donne plusieurs.
+const vus = new Set(), formes = new Map(), file = (process.env.ROBOT_DEPART || '/').split(',').map(x => x.trim()).filter(Boolean), ecrans = [], rouges = []
 const cle = u => u.split('#')[0]
 const SEL = 'a[href],button,[role=button],[role=tab],[role=link],input,select,textarea,summary,[onclick]'
 while (file.length && ecrans.length < +MAXE) {
@@ -74,7 +75,8 @@ while (file.length && ecrans.length < +MAXE) {
       await p.waitForTimeout(400)
       clics.push({ nom: e.nom || '(sans nom)', ok: err.length === avant })
     } catch (x) { clics.push({ nom: e.nom || '(sans nom)', ok: false, raison: 'ne repond pas : ' + x.message.split('\n')[0].slice(0, 70) }) }
-    if (cle(p.url().replace(ORIG, '')) !== u) await p.goto(BASE + u, { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => {})
+    // Après chaque clic, l'écran est rechargé : la liste des boutons ne bouge pas sous le robot (sinon le n-ième bouton n'est plus le même).
+    await p.goto(BASE + u, { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => {}); await p.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {})
   }
   p.off('console', onC); p.off('pageerror', onP); p.off('response', onR)
   const sansNom = m.elements.filter(e => !e.nom && e.tag !== 'input').length

@@ -17,7 +17,7 @@ permissions:
 concurrency: { group: porte, cancel-in-progress: false }
 jobs:
   porte:
-    if: github.actor != 'github-actions[bot]'
+    if: github.event_name == 'workflow_dispatch' || github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:

@@ -9,7 +9,7 @@ A=/opt/hs/accepte/server; [ -d $A ] || A=/opt/hs/repo/server
 exec 9>/run/hs-lourd.lock; flock -w 7200 9   # jamais en même temps que la génération de nuit ou la porte (mémoire)
 J=$(date -u +%F); OUT=$ETAT/robot/$J
 mkdir -p $ETAT/robot; rm -rf $OUT; mkdir -p $OUT; chown hsrobot $OUT
-runuser -u hsrobot -- env PATH=$PATH PW_PACKAGE=$PW_PACKAGE PLAYWRIGHT_BROWSERS_PATH=$PLAYWRIGHT_BROWSERS_PATH HOME=$HOME \
+runuser -u hsrobot -- env ROBOT_DEPART="/?lang=fr,/?lang=ar" PATH=$PATH PW_PACKAGE=$PW_PACKAGE PLAYWRIGHT_BROWSERS_PATH=$PLAYWRIGHT_BROWSERS_PATH HOME=$HOME \
   timeout 3000 node $A/robot/robot-universel.mjs https://halal.shopping $OUT 40 20 "Pixel 7" > $OUT/journal.txt 2>&1
 c=$?
 ln -sfn $OUT $ETAT/robot/dernier
