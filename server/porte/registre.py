@@ -83,6 +83,10 @@ def depuis_robot(f):
         return appliquer("robot", [{"cle": "robot|serveur-malade", "titre": "Robot de nuit non lancé : site malade au contrôle de santé",
                                     "detail": json.dumps(r.get("sante"), ensure_ascii=False)}])
     out = []
+    # Contrôle F-ROBOT-UN-ECRAN (21/11) : un robot qui ne lit qu'un écran ne prouve rien.
+    if r.get("total", {}).get("ecrans", 0) < 2:
+        out.append({"cle": "robot|couverture", "titre": f"Robot de nuit : couverture insuffisante ({r.get('total', {}).get('ecrans', 0)} écran lu, minimum 2)",
+                    "detail": "Donner des écrans de départ (ROBOT_DEPART) ou des liens à suivre"})
     for e in r.get("rouges", []):
         for p in e["problemes"]:
             genre = re.sub(r"\d+", "#", p.split(":")[0])[:60]

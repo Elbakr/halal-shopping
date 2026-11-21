@@ -128,6 +128,8 @@ if [ -f server/robot-run ] && ! cmp -s server/robot-run /opt/hs/.robot-run && [ 
   echo "time: $(date -u +%FT%TZ)"
   echo "deployed: $(cat /opt/hs/.deployed 2>/dev/null)"
   echo "porte: $(cat $P/porte.txt 2>/dev/null | cut -c1-300) $( [ -f /opt/hs/outils/.pret ] || echo '(outils en installation)')"
+  # Contrôle F-REFSPEC (21/11) : le dernier verdict du site publié sur GitHub doit être celui que le serveur a reçu.
+  if git cat-file -e refs/remotes/origin/porte:site.json 2>/dev/null && ! git show refs/remotes/origin/porte:site.json | cmp -s - $P/porte/site.json; then echo "porte site: DÉSYNCHRONISÉE (verdict GitHub non reçu)"; else echo "porte site: synchronisée"; fi
   echo "porte essai: $(cat $P/porte-essai.txt 2>/dev/null | cut -c1-300)"
   echo "robot: $(cat $P/robot.txt 2>/dev/null | cut -c1-250)"
   echo "registre: $(python3 -c 'import json;r=json.load(open("'$P/registre.json'"));print(r.get("ouvertes",0),"tâche(s) ouverte(s) sur",len(r["taches"]))' 2>/dev/null || echo vide) — https://api.halal.shopping/_etat/registre.json"

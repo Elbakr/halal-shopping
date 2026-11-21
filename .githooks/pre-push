@@ -1,0 +1,9 @@
+#!/bin/sh
+# Contrôle F-SUPPRESSION-BRANCHE (21/11) : règle du fondateur du 30/09 — aucune suppression de branche
+# sans fiche approuvée par lui. Tout envoi qui supprime une branche distante est refusé ici.
+while read lref lsha rref rsha; do
+  case "$lsha" in 0000000000000000000000000000000000000000)
+    echo "REFUSÉ : suppression de $rref interdite sans accord écrit du fondateur (règle du 30/09)." >&2; exit 1;;
+  esac
+done
+exit 0
