@@ -10,7 +10,8 @@ const COLS = {
   place_links: "Lien ajouté (réservation, avis…)", media_flags: "Plainte sur une photo", orgs: "Inscription d'un organisme",
   org_items: "Certification déposée par un organisme",
 };
-const DEST = "contact@halal.shopping";
+const DEST = "contact@halal.shopping", DEST_GMAIL = "elbazikarim@gmail.com";
+function sec(n) { try { return String($app.findFirstRecordByData("hs_secrets", "name", n).get("value") || ""); } catch (e) { return ""; } }
 const CACHE = ["id", "collectionId", "collectionName", "who", "device", "updated", "fp", "h"];
 function texte(rec) {
   const col = rec.collection().name, lignes = [COLS[col] || col, "Reçu le : " + String(rec.get("created")).slice(0, 19) + " UTC", ""];
@@ -45,6 +46,18 @@ function enfiler(rec, historique) {
 function actif() { try { return $app.findFirstRecordByData("hs_secrets", "name", "entrees_transport").get("value") === "ok"; } catch (e) { return false; } }
 function envoyer(r) {
   if ($os.getenv("HS_ESSAI")) { r.set("erreur", "serveur d'essai de la porte : aucun envoi"); return false; }
+  const rk = sec("resend_cle"), rf = sec("resend_de");
+  if (rk && rf) {
+    try {
+      const res = $http.send({ url: "https://api.resend.com/emails", method: "POST", timeout: 20,
+        headers: { "Authorization": "Bearer " + rk, "Content-Type": "application/json" },
+        body: JSON.stringify({ from: rf, to: [DEST_GMAIL], subject: r.get("sujet"), text: r.get("texte") }) });
+      if (res.statusCode >= 200 && res.statusCode < 300) { r.set("envoye", new Date().toISOString().replace("T", " ")); r.set("erreur", ""); }
+      else r.set("erreur", "resend " + res.statusCode + " " + String(res.raw || "").slice(0, 200));
+    } catch (e) { r.set("erreur", String(e).slice(0, 300)); }
+    r.set("essais", (r.get("essais") || 0) + 1); $app.save(r);
+    return !r.get("erreur");
+  }
   try {
     const m = new MailerMessage({ from: { address: "noreply@halal.shopping", name: "halal.shopping" }, to: [{ address: DEST }],
       subject: r.get("sujet"), text: r.get("texte"), html: "<pre style=\"font-family:system-ui,sans-serif;white-space:pre-wrap\">" + String(r.get("texte")).replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</pre>" });
@@ -80,6 +93,12 @@ function admin(e) {
     t.set("value", ok ? "ok" : "ko"); $app.save(t);
     return e.json(ok ? 200 : 502, { ok: ok, erreur: r.get("erreur") });
   }
+  if (op === "lien_depot") {
+    const j = $security.randomString(40);
+    let t; try { t = $app.findFirstRecordByData("hs_secrets", "name", "depot_jeton"); } catch (x) { t = new Record($app.findCollectionByNameOrId("hs_secrets")); t.set("name", "depot_jeton"); }
+    t.set("value", JSON.stringify({ sha: $security.sha256(j), fin: Date.now() + 864e5 })); $app.save(t);
+    return e.json(200, { jeton: j, fin: "24 h", usage: "POST /api/hs/depot {jeton, resend_cle, resend_de} — une seule fois" });
+  }
   if (op === "historique") {
     let n = 0;
     for (const col of Object.keys(COLS)) {
@@ -93,4 +112,24 @@ function admin(e) {
   return e.json(200, { total: rows.length, non_envoyes: rows.filter((r) => !r.get("envoye")).length,
     lignes: rows.map((r) => ({ ref: r.get("ref"), sujet: r.get("sujet"), envoye: r.get("envoye"), essais: r.get("essais"), erreur: r.get("erreur"), texte: op === "detail" ? r.get("texte") : undefined })) });
 }
-module.exports = { COLS, enfiler, passe, admin, actif };
+// Dépôt à usage unique (sans clé admin) : le cerveau dépose la clé Resend déjà existante et l'adresse d'expédition
+// vérifiée. Le jeton expire en 24 h et s'efface au premier usage. Puis un essai réel est envoyé.
+function depot(e) {
+  let b = {}; try { b = e.requestInfo().body || {}; } catch (x) {}
+  let d = {}; try { d = JSON.parse(sec("depot_jeton") || "{}"); } catch (x) {}
+  if (!d.sha || Date.now() > d.fin || $security.sha256(String(b.jeton || "")) !== d.sha) return e.json(403, { message: "refuse" });
+  const cle = String(b.resend_cle || "").trim(), de = String(b.resend_de || "").trim();
+  if (!/^re_[A-Za-z0-9_]{10,}$/.test(cle) || !/@/.test(de)) return e.json(400, { message: "resend_cle (re_...) et resend_de (adresse vérifiée) attendus" });
+  for (const [n, v] of [["resend_cle", cle], ["resend_de", de], ["depot_jeton", ""]]) {
+    let t; try { t = $app.findFirstRecordByData("hs_secrets", "name", n); } catch (x) { t = new Record($app.findCollectionByNameOrId("hs_secrets")); t.set("name", n); }
+    t.set("value", v); $app.save(t);
+  }
+  const r = new Record($app.findCollectionByNameOrId("entrees_envoi"));
+  r.set("ref", "test/" + Date.now()); r.set("sujet", "[TEST] halal.shopping : envoi des entrées extérieures");
+  r.set("texte", "Message d'essai : les entrées extérieures de halal.shopping arrivent dans cette boîte.\nbuild by Uxlab.ai"); r.set("essais", 0); $app.save(r);
+  const ok = envoyer(r);
+  let t; try { t = $app.findFirstRecordByData("hs_secrets", "name", "entrees_transport"); } catch (x) { t = new Record($app.findCollectionByNameOrId("hs_secrets")); t.set("name", "entrees_transport"); }
+  t.set("value", ok ? "ok" : "ko"); $app.save(t);
+  return e.json(ok ? 200 : 502, { ok: ok, erreur: r.get("erreur") });
+}
+module.exports = { COLS, enfiler, passe, admin, actif, depot };

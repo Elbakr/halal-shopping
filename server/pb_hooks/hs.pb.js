@@ -49,4 +49,5 @@ onRecordAfterCreateSuccess((e) => {
 }, "signals", "place_signals", "place_ratings", "added_places", "contributions", "place_media", "place_links", "media_flags", "orgs", "org_items");
 routerAdd("POST", "/api/hs/admin/entrees", (e) => require(`${__hooks}/hs_entrees.js`).admin(e));
 routerAdd("GET", "/api/hs/admin/entrees", (e) => require(`${__hooks}/hs_entrees.js`).admin(e));
+routerAdd("POST", "/api/hs/depot", (e) => require(`${__hooks}/hs_entrees.js`).depot(e));
 cronAdd("hs_entrees", "*/5 * * * *", () => { try { const E = require(`${__hooks}/hs_entrees.js`); if (E.actif()) E.passe(); } catch (x) { console.log("entrees cron:", x); } });
