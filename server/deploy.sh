@@ -7,8 +7,8 @@
 set -u
 cd /opt/hs/repo || exit 1
 git fetch -q --depth 50 origin main && git reset -q --hard origin/main
-git fetch -q --depth 1 origin porte:refs/remotes/origin/porte 2>/dev/null
-git fetch -q --depth 1 origin essai-serveur:refs/remotes/origin/essai-serveur 2>/dev/null || git update-ref -d refs/remotes/origin/essai-serveur 2>/dev/null
+git fetch -q --depth 1 origin +porte:refs/remotes/origin/porte 2>/dev/null
+git fetch -q --depth 1 origin +essai-serveur:refs/remotes/origin/essai-serveur 2>/dev/null || git update-ref -d refs/remotes/origin/essai-serveur 2>/dev/null
 E=/opt/hs/etat; P=/var/www/status/etat; A=/opt/hs/accepte
 mkdir -p $E $P/porte
 NEW=$(git rev-parse HEAD:server 2>/dev/null)
