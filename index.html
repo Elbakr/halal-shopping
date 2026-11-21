@@ -1297,9 +1297,14 @@ var chosen=store("hs_lang_choice");
 var first=(urlLang&&LANGS[urlLang])?urlLang:(chosen&&LANGS[chosen])?chosen:(browserLangs()[0]||"en");
 applyLang(first);
 // One IP lookup every 6 h at most (ipapi.co limits requests per address: a reload must not cost a call).
-function ipInfo(){ try{var c=JSON.parse(store("hs_ip")||"null"); if(c&&Date.now()-c.t<216e5)return Promise.resolve(c)}catch(e){}
-  return fetch("https://ipapi.co/json/").then(function(r){return r.ok?r.json():null}).then(function(j){ if(!j||!j.country_code)return null;
-    var c={t:Date.now(),cc:j.country_code,lat:j.latitude,lon:j.longitude,city:j.city||""}; store("hs_ip",JSON.stringify(c)); return c }).catch(function(){return null}) }
+// Two free sources open to browsers: geojs.io first (no daily limit announced), ipapi.co as a fallback; a failure is
+// remembered for 1 h so that a page reload never hammers a service that refuses us.
+function ipInfo(){ try{var c=JSON.parse(store("hs_ip")||"null"); if(c&&Date.now()-c.t<(c.cc?216e5:36e5))return Promise.resolve(c.cc?c:null)}catch(e){}
+  function keep(c){store("hs_ip",JSON.stringify(c));return c.cc?c:null}
+  function src(u,f){return fetch(u).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){var c=f(j);if(!c.cc)throw 0;return c})}
+  return src("https://get.geojs.io/v1/ip/geo.json",function(j){return {t:Date.now(),cc:j.country_code,lat:+j.latitude,lon:+j.longitude,city:j.city||""}})
+    .catch(function(){return src("https://ipapi.co/json/",function(j){return {t:Date.now(),cc:j.country_code,lat:j.latitude,lon:j.longitude,city:j.city||""}})})
+    .then(keep).catch(function(){return keep({t:Date.now(),cc:""})}) }
 if(!urlLang&&!chosen){
   var geo=function(u,f){return Promise.race([fetch(u).then(function(r){if(!r.ok)throw 0;return r.json()}).then(f),new Promise(function(_,no){setTimeout(no,2500)})])};
   geo("https://api.country.is/",function(j){return j.country})
