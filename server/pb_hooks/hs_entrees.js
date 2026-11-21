@@ -40,6 +40,9 @@ function enfiler(rec, historique) {
   $app.save(r);
   return true;
 }
+// L'envoi n'est actif que si le transport a été prouvé (op « test » réussie) : le port 25 sortant peut être fermé
+// par l'hébergeur, et un envoi qui pend ne doit jamais bloquer le serveur.
+function actif() { try { return $app.findFirstRecordByData("hs_secrets", "name", "entrees_transport").get("value") === "ok"; } catch (e) { return false; } }
 function envoyer(r) {
   if ($os.getenv("HS_ESSAI")) { r.set("erreur", "serveur d'essai de la porte : aucun envoi"); return false; }
   try {
@@ -73,6 +76,8 @@ function admin(e) {
     r.set("ref", "test/" + Date.now()); r.set("sujet", "[TEST] halal.shopping : envoi des entrées extérieures");
     r.set("texte", "Message d'essai : si vous le lisez, les entrées extérieures de halal.shopping arrivent bien dans cette boîte.\nbuild by Uxlab.ai"); r.set("essais", 0);
     $app.save(r); const ok = envoyer(r);
+    let t; try { t = $app.findFirstRecordByData("hs_secrets", "name", "entrees_transport"); } catch (x) { t = new Record($app.findCollectionByNameOrId("hs_secrets")); t.set("name", "entrees_transport"); }
+    t.set("value", ok ? "ok" : "ko"); $app.save(t);
     return e.json(ok ? 200 : 502, { ok: ok, erreur: r.get("erreur") });
   }
   if (op === "historique") {
@@ -81,11 +86,11 @@ function admin(e) {
       let recs = []; try { recs = $app.findRecordsByFilter(col, "id != ''", "created", 2000, 0); } catch (x) { continue; }
       for (const rec of recs) if (enfiler(rec, true)) n++;
     }
-    return e.json(200, { en_file: n, passe: passe() });
+    return e.json(200, { en_file: n, passe: actif() ? passe() : "transport non prouvé : rien envoyé" });
   }
-  if (op === "passe") return e.json(200, passe());
+  if (op === "passe") return e.json(200, actif() ? passe() : { transport: "non prouvé" });
   const rows = $app.findRecordsByFilter("entrees_envoi", "id != ''", "-created", 200, 0);
   return e.json(200, { total: rows.length, non_envoyes: rows.filter((r) => !r.get("envoye")).length,
     lignes: rows.map((r) => ({ ref: r.get("ref"), sujet: r.get("sujet"), envoye: r.get("envoye"), essais: r.get("essais"), erreur: r.get("erreur"), texte: op === "detail" ? r.get("texte") : undefined })) });
 }
-module.exports = { COLS, enfiler, passe, admin };
+module.exports = { COLS, enfiler, passe, admin, actif };
