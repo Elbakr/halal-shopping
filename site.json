@@ -1,0 +1,14 @@
+{
+ "verdict": "VERT",
+ "ecrans": 28,
+ "rouges": 0,
+ "nouveaux": [],
+ "connus": [],
+ "gueris": [],
+ "passages": 1,
+ "heure": "2026-11-21T14:50:15Z",
+ "etape": "apres",
+ "code": 0,
+ "sha": "695206ba82263529a8cab7002df23ea82ec6a592",
+ "run": "https://github.com/Elbakr/halal-shopping/actions/runs/44915806474"
+}
