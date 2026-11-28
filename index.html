@@ -1289,7 +1289,8 @@ cc("PT BR AO MZ GW CV ST TL","pt"); cc("TR","tr"); cc("CY","tr en"); cc("ID","id
 cc("RU BY KZ KG","ru"); cc("CN TW HK MO","zh"); cc("JP","ja"); cc("IN","hi en bn"); cc("BD","bn"); cc("PK","ur en");
 Object.keys(COUNTRY).forEach(function(k){COUNTRY[k]=COUNTRY[k].split(" ")});
 function browserLangs(){return (navigator.languages||[navigator.language||""]).map(function(x){return String(x).slice(0,2).toLowerCase()}).filter(function(x){return LANGS[x]})}
-function pickFor(country){var langs=COUNTRY[country]||["en"], b=browserLangs();for(var i=0;i<b.length;i++){if(langs.indexOf(b[i])>=0)return b[i]}return langs[0]}
+// La langue du navigateur prime sur le pays de l'adresse IP (HS-01 : un navigateur fr-BE derrière une IP allemande voyait l'allemand).
+function pickFor(country){var langs=COUNTRY[country]||["en"], b=browserLangs();for(var i=0;i<b.length;i++){if(langs.indexOf(b[i])>=0)return b[i]}return b.length?b[0]:langs[0]}
 $("lang").innerHTML=Object.keys(LANGS).map(function(k){return '<option value="'+k+'">'+LANGS[k]+'</option>'}).join("");
 $("lang").addEventListener("change",function(){store("hs_lang_choice",this.value);applyLang(this.value);try{history.replaceState(null,"","?lang="+this.value+location.hash)}catch(e){}});
 var urlLang=(location.search.match(/[?&]lang=([a-z]{2})/)||[])[1];
